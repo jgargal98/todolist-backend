@@ -62,7 +62,7 @@ public static class DbInitializer
         // Retrieving credentials from IConfiguration (Environment Variables or AppSettings)
         // Azure Key: SeedData__AdminEmail / SeedData__AdminPassword
         string adminEmail = configuration["SeedData:AdminEmail"] ?? "admin@todolist.com";
-        string adminPassword = configuration["SeedData:AdminPassword"] ?? "123";
+        string adminPassword = configuration["SeedData:AdminPassword"] ?? "Admin789!";
 
         // Requirement: LINQ Method Syntax to check for existing users
         if (!await userManager.Users.AnyAsync(u => u.Email == adminEmail))
