@@ -6,10 +6,9 @@ namespace TodoList.API.Controllers;
 [Route("api/[controller]")] // /api/helloworld
 public class HelloWorldController : ControllerBase
 {
-    // Este método responde a GET /api/todo
     [HttpGet]
     public IActionResult Get()
     {
-        return Ok(new { mensaje = "Si lees esto me debes 20 pavos" });
+        return Ok("Si lees esto me debes 20 pavos");
     }
 }

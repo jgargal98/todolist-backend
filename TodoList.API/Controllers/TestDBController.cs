@@ -6,7 +6,6 @@ namespace TodoList.API.Controllers;
 [Route("api/[controller]")] // /api/testdb
 public class TestDBController : ControllerBase
 {
-    // Este método responde a GET /api/todo
     [HttpGet]
     public IActionResult Get()
     {
