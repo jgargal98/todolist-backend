@@ -1,0 +1,51 @@
+backend/
+├── backend/
+├── TodoList.API/
+│   ├── appsettings.json
+│   ├── Controllers/
+│   │   ├── HelloWorldController.cs
+│   │   ├── TestDBController.cs
+│   │   └── UsersController.cs
+│   ├── Program.cs
+│   ├── Properties/
+│   │   └── launchSettings.json
+│   └── TodoList.API.csproj
+├── TodoList.Application/
+│   ├── DTOs/
+│   │   └── User/
+│   │       └── UserResponseDto.cs
+│   ├── Interfaces/
+│   │   └── IUserService.cs
+│   ├── Services/
+│   │   ├── DependencyInjection.cs
+│   │   └── UserService.cs
+│   └── TodoList.Application.csproj
+├── TodoList.Domain/
+│   ├── Entities/
+│   │   ├── ApplicationUser.cs
+│   │   ├── Category.cs
+│   │   ├── Tag.cs
+│   │   ├── TaskItem.cs
+│   │   └── TaskSupport.cs
+│   ├── Interfaces/
+│   │   └── IUserRepository.cs
+│   └── TodoList.Domain.csproj
+├── TodoList.Infrastructure/
+│   ├── Data/
+│   │   ├── AppDbContext.cs
+│   │   ├── AppDbContextFactory.cs
+│   │   └── Configurations/
+│   │       ├── ApplicationUserConfiguration.cs
+│   │       ├── CategoryConfiguration.cs
+│   │       ├── TagConfiguration.cs
+│   │       └── TaskItemConfiguration.cs
+│   ├── DbInitializer.cs
+│   ├── DependencyInjection.cs
+│   ├── Migrations/
+│   │   ├── 20260507081844_InitialCreate.cs
+│   │   ├── 20260507081844_InitialCreate.Designer.cs
+│   │   └── AppDbContextModelSnapshot.cs
+│   ├── Repositories/
+│   │   └── UserRepository.cs
+│   └── TodoList.Infrastructure.csproj
+└── TodoList.slnx
