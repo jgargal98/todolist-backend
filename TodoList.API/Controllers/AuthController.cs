@@ -5,38 +5,44 @@ using TodoList.Application.Services;
 namespace TodoList.API.Controllers;
 
 /// <summary>
-/// Handles authentication-related API requests.
+/// Controller responsible for managing user identity and session tokens.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(AuthService authService) : ControllerBase
 {
-    private readonly AuthService _authService;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="AuthController"/> class.
+    /// Handles the initial user authentication process.
     /// </summary>
-    /// <param name="authService">The application service for authentication.</param>
-    public AuthController(AuthService authService)
-    {
-        _authService = authService;
-    }
-
-    /// <summary>
-    /// Authenticates a user and returns a JWT token.
-    /// </summary>
-    /// <param name="request">The login credentials.</param>
-    /// <returns>A 200 OK with the token, or 401 Unauthorized if credentials fail.</returns>
+    /// <param name="request">The credentials provided by the user.</param>
+    /// <returns>An <see cref="AuthResponse"/> if valid; otherwise, 401 Unauthorized.</returns>
     [HttpPost("login")]
-    [ProducesResponseType(typeof(AuthResponse), 200)]
-    [ProducesResponseType(401)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var response = await _authService.LoginAsync(request);
+        var response = await authService.LoginAsync(request);
 
         if (response is null)
         {
             return Unauthorized("Invalid credentials.");
+        }
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Exchanges an expired access token for a new pair of tokens.
+    /// </summary>
+    /// <param name="request">The expired JWT and valid Refresh Token.</param>
+    /// <returns>A new <see cref="AuthResponse"/> if the session is valid; otherwise, 401 Unauthorized.</returns>
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
+    {
+        // Now that AuthService has RefreshAsync implemented, the controller just delegates
+        var response = await authService.RefreshAsync(request);
+
+        if (response is null)
+        {
+            return Unauthorized("The session has expired or the token is invalid.");
         }
 
         return Ok(response);

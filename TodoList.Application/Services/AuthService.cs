@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using TodoList.Application.DTOs.Auth;
 using TodoList.Domain.Entities;
 using TodoList.Domain.Interfaces;
@@ -19,7 +20,7 @@ public sealed class AuthService
     }
 
     /// <summary>
-    /// Validates credentials and manages session persistence through abstractions.
+    /// Authenticates a user via email and password.
     /// </summary>
     public async Task<AuthResponse?> LoginAsync(LoginRequest request)
     {
@@ -34,18 +35,48 @@ public sealed class AuthService
     }
 
     /// <summary>
-    /// Internal helper to set token state and delegate persistence to the repository.
+    /// Authenticates a user via an expired Access Token and a valid Refresh Token.
+    /// </summary>
+    public async Task<AuthResponse?> RefreshAsync(RefreshRequest request)
+    {
+        var principal = _jwtProvider.GetPrincipalFromExpiredToken(request.AccessToken);
+        var email = principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+        if (string.IsNullOrEmpty(email)) return null;
+
+        var user = await _userRepository.GetByEmailAsync(email);
+
+        // Explicit check to satisfy the compiler and ensure domain safety
+        if (user is null || !IsRefreshTokenValid(user, request.RefreshToken))
+        {
+            return null;
+        }
+
+        // Now 'user' is guaranteed to be non-null for GenerateAuthResponse
+        return await GenerateAuthResponse(user);
+    }
+
+    /// <summary>
+    /// Validates if the provided refresh token matches the stored one and is not expired.
+    /// </summary>
+    private bool IsRefreshTokenValid(User? user, string providedToken)
+    {
+        return user is not null &&
+               user.RefreshToken == providedToken &&
+               user.RefreshTokenExpiryTime > DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Centralized method to update user state and generate the final DTO.
     /// </summary>
     private async Task<AuthResponse> GenerateAuthResponse(User user)
     {
         var accessToken = _jwtProvider.Generate(user);
         var refreshToken = _jwtProvider.GenerateRefreshToken();
 
-        // The Service updates the state of the Domain Entity
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
 
-        // The Service commands the Repository to persist the changes
         await _userRepository.UpdateAsync(user);
 
         return new AuthResponse(accessToken, refreshToken, user.Email!);
