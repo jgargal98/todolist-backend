@@ -9,6 +9,6 @@ public class HelloWorldController : ControllerBase
     [HttpGet]
     public IActionResult Get()
     {
-        return Ok("Si lees esto me debes 20 pavos");
+        return Ok("hello from the api");
     }
 }
