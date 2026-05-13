@@ -14,10 +14,20 @@ using TodoList.Infrastructure.Repositories;
 namespace TodoList.Infrastructure;
 
 /// <summary>
-/// Centralizes infrastructure service registrations.
+/// Centralizes the registration of infrastructure-related services into the dependency injection container.
 /// </summary>
+/// <remarks>
+/// This class follows the Extension Method pattern to keep the API's Program.cs clean 
+/// and to encapsulate infrastructure details such as Persistence, Identity, and Authentication.
+/// </remarks>
 public static class DependencyInjection
 {
+    /// <summary>
+    /// Registers all infrastructure services including Database, Identity, and JWT Authentication.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="configuration">The application configuration to retrieve settings like connection strings.</param>
+    /// <returns>The modified <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services
@@ -25,11 +35,15 @@ public static class DependencyInjection
             .AddIdentityConfiguration()
             .AddAuthenticationInternal(configuration);
 
+        // Repository Registration
         services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }
 
+    /// <summary>
+    /// Configures the database context and persistence layer.
+    /// </summary>
     private static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection")
@@ -38,10 +52,12 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(connectionString));
 
-
         return services;
     }
 
+    /// <summary>
+    /// Sets up ASP.NET Core Identity with custom password requirements.
+    /// </summary>
     private static IServiceCollection AddIdentityConfiguration(this IServiceCollection services)
     {
         services.AddIdentity<User, IdentityRole>(options =>
@@ -52,11 +68,16 @@ public static class DependencyInjection
         })
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
+
         return services;
     }
 
+    /// <summary>
+    /// Configures JWT-based authentication and token validation parameters.
+    /// </summary>
     private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services, IConfiguration configuration)
     {
+        // Bind JWT settings from appsettings.json to the JwtOptions class
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
         services.AddScoped<IJwtProvider, JwtProvider>();
 
@@ -76,7 +97,8 @@ public static class DependencyInjection
                 ValidIssuer = configuration["Jwt:Issuer"],
                 ValidAudience = configuration["Jwt:Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt SecretKey not found.")))
+                    Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ??
+                    throw new InvalidOperationException("Jwt SecretKey not found.")))
             };
         });
 
