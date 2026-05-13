@@ -71,7 +71,7 @@ var app = builder.Build();
 // Custom middleware to handle exceptionss
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// Enables Swagger UI in both Development and Production (helpful for tutors)
+// Enables Swagger UI
 app.UseSwagger();
 app.UseSwaggerUI(c =>
     {
@@ -95,8 +95,7 @@ app.MapControllers();
 /// Automatically applies migrations at startup to ensure the database is ready.
 /// </summary>
 /// 
-
-// Call the initializer passing the path
+// Call the initializer
 await app.Services.InitializeDatabaseAsync();
 
 app.Run();
