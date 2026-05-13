@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using TodoList.Application.DTOs.Auth;
+using TodoList.Application.Interfaces;
 using TodoList.Domain.Entities;
 using TodoList.Domain.Interfaces;
 
@@ -8,7 +9,7 @@ namespace TodoList.Application.Services;
 /// <summary>
 /// Orchestrates authentication flows by interacting with domain abstractions.
 /// </summary>
-public sealed class AuthService
+public sealed class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IJwtProvider _jwtProvider;

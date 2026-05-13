@@ -46,14 +46,15 @@ builder.Services.AddSwaggerGen(options =>
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        In = ParameterLocation.Header
+        Scheme = "bearer",
+        In = ParameterLocation.Header,
+        BearerFormat = "JWT"
     });
 
-    options.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+    options.AddSecurityRequirement((doc) => new OpenApiSecurityRequirement
     {
         {
-            new OpenApiSecuritySchemeReference("Bearer"),
+            new OpenApiSecuritySchemeReference("Bearer", doc),
             new List<string>()
         }
     });
@@ -67,7 +68,11 @@ var app = builder.Build();
 /// </summary>
 // Enables Swagger UI in both Development and Production (helpful for tutors)
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+        c.EnablePersistAuthorization();
+    });
 
 //app.UseHttpsRedirection();
 // Use CORS before Authentication

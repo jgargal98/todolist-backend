@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace TodoList.API.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = "Bearer")]
 [ApiController]
 [Route("api/[controller]")]
 public class UsersController : ControllerBase

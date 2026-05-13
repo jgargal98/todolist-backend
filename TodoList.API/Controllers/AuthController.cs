@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TodoList.Application.DTOs.Auth;
-using TodoList.Application.Services;
+using TodoList.Application.Interfaces;
 
 namespace TodoList.API.Controllers;
 
@@ -9,7 +9,7 @@ namespace TodoList.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(AuthService authService) : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
     /// <summary>
     /// Handles the initial user authentication process.
