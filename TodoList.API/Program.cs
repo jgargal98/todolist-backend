@@ -1,14 +1,11 @@
 using TodoList.Infrastructure;
 using TodoList.Application.Services;
-using System.Reflection;
 using Microsoft.OpenApi;
 using TodoList.Application.Mappings;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
 // --- 1. SERVICE CONFIGURATION (Dependency Injection Container) ---
-
 // --- REGISTER LAYERS ---
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -40,16 +37,26 @@ builder.Services.AddCors(options =>
 /// Configure Swagger/OpenAPI for interactive documentation.
 /// </summary>
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "API 2026", Version = "v1" });
 
-    // Solo intenta incluirlo si el archivo existe físicamente
-    if (File.Exists(xmlPath))
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        options.IncludeXmlComments(xmlPath);
-    }
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        In = ParameterLocation.Header
+    });
+
+    options.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer"),
+            new List<string>()
+        }
+    });
 });
 
 var app = builder.Build();
