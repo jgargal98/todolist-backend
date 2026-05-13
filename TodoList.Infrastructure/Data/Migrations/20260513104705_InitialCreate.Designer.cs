@@ -9,10 +9,10 @@ using TodoList.Infrastructure.Data;
 
 #nullable disable
 
-namespace TodoList.Infrastructure.Migrations
+namespace TodoList.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260513100658_InitialCreate")]
+    [Migration("20260513104705_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -300,6 +300,12 @@ namespace TodoList.Infrastructure.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");

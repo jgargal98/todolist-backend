@@ -8,7 +8,7 @@ using TodoList.Infrastructure.Data;
 
 #nullable disable
 
-namespace TodoList.Infrastructure.Migrations
+namespace TodoList.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -298,15 +298,12 @@ namespace TodoList.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-<<<<<<< HEAD
                     b.Property<string>("RefreshToken")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("RefreshTokenExpiryTime")
                         .HasColumnType("datetime2");
 
-=======
->>>>>>> refactor-dbcontext-init
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 

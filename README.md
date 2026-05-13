@@ -44,13 +44,13 @@ The following structure demonstrates the separation of concerns. The Domain laye
 
 ```text
 todolist/
-├── .github/workflows/          # CI/CD Pipelines (Backend & Frontend)
 ├── backend/
 │   ├── TodoList.API/           # Entry point, Controllers, and Program.cs
 │   ├── TodoList.Application/   # DTOs, Interfaces, Mappings, and Services
 │   ├── TodoList.Domain/        # Entities and Repository Interfaces
 │   └── TodoList.Infrastructure/# Data Context, Repositories, and Migrations
 │
+...
 │
 └── frontend/                   # Angular front end
 ```
@@ -68,11 +68,4 @@ The following critical backend milestones have been achieved:
 - Clean Architecture Implementation: Structured the solution into Domain, Application, Infrastructure, and API projects.
 - DTO Mapping: Integrated AutoMapper to decouple domain entities from API responses, ensuring secure data transfer and abstraction.
 - Repository Pattern: Established the foundation for data access through interfaces in the Domain layer and implementations in the Infrastructure layer.
-
-## Current Status
-
-- Backend (API): Fully operational. Deployed on Azure App Service using .NET 10 LTS. The API handles database migrations automatically via the DbInitializer on startup.
-- Frontend: Fully deployed. Hosted as an Azure Static Web App, communicating with the production API endpoint.
-- Connectivity: Link between App Service and SQL Database verified through environment variables.
-- Codebase: Repository synchronized and hardened against credential leaks.
-- Database: Schema is up to date and provisioned on Azure SQL.
+- Authorization: Using JWT
