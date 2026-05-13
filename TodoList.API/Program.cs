@@ -4,11 +4,9 @@ using System.Reflection;
 using Microsoft.OpenApi;
 using TodoList.Application.Mappings;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // --- 1. SERVICE CONFIGURATION (Dependency Injection Container) ---
-
 // --- REGISTER LAYERS ---
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -76,6 +74,9 @@ app.MapControllers();
 /// <summary>
 /// Automatically applies migrations at startup to ensure the database is ready.
 /// </summary>
+/// 
+
+// Call the initializer passing the path
 await app.Services.InitializeDatabaseAsync();
 
 app.Run();
