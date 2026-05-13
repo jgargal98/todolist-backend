@@ -14,16 +14,19 @@ public static class DbInitializer
     /// <summary>
     /// Ensures the database exists and seeds the initial admin user.
     /// </summary>
+    /// <summary>
+    /// Initializes the database by setting the data directory, applying migrations, and seeding data.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider to resolve dependencies.</param>
+    /// <param name="dataPath">The absolute path where the database files should be stored.</param>
     public static async Task InitializeDatabaseAsync(this IServiceProvider serviceProvider)
     {
+
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-        // 1. Create the database and tables if they don't exist (No migrations needed)
-        await context.Database.EnsureCreatedAsync();
-
-        // 2. Seed Admin User
+        await context.Database.MigrateAsync();
         await SeedDefaultUserAsync(userManager);
     }
 
