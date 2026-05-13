@@ -2,6 +2,7 @@ using TodoList.Infrastructure;
 using TodoList.Application.Services;
 using Microsoft.OpenApi;
 using TodoList.Application.Mappings;
+using TodoList.Infrastructure.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +67,10 @@ var app = builder.Build();
 /// <summary>
 /// Define the request processing pipeline using Middlewares.
 /// </summary>
+
+// Custom middleware to handle exceptionss
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 // Enables Swagger UI in both Development and Production (helpful for tutors)
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -81,6 +86,7 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 // Crucial: Checking user permissions
 app.UseAuthorization();
+
 // Route requests to Controller actions
 app.MapControllers();
 
