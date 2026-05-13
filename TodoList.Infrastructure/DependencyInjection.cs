@@ -38,6 +38,7 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(connectionString));
 
+
         return services;
     }
 
@@ -47,13 +48,10 @@ public static class DependencyInjection
         {
             options.Password.RequireDigit = true;
             options.Password.RequiredLength = 6;
-            options.Password.RequireNonAlphanumeric = true;
-            options.Password.RequireUppercase = true;
-            options.Password.RequireLowercase = true;
+            options.Password.RequireNonAlphanumeric = false;
         })
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
-
         return services;
     }
 

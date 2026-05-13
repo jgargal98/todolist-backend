@@ -88,6 +88,9 @@ app.MapControllers();
 /// <summary>
 /// Automatically applies migrations at startup to ensure the database is ready.
 /// </summary>
-app.Services.InitializeDatabase(app.Environment.IsDevelopment());
+/// 
+
+// Call the initializer passing the path
+await app.Services.InitializeDatabaseAsync();
 
 app.Run();
