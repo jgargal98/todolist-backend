@@ -19,7 +19,9 @@ public interface IAuthService
     /// A <see cref="AuthResponse"/> containing the JWT and refresh token if successful; 
     /// otherwise, <see langword="null"/>.
     /// </returns>
-    Task<AuthResponse?> LoginAsync(LoginRequest request);
+    Task<AuthResponse> LoginAsync(LoginRequest request);
+
+    Task<AuthResponse> RegisterAsync(RegisterRequest request);
 
     /// <summary>
     /// Generates a new access token using a valid refresh token.

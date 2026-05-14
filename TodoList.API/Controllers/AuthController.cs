@@ -12,21 +12,32 @@ namespace TodoList.API.Controllers;
 public class AuthController(IAuthService authService) : ControllerBase
 {
     /// <summary>
-    /// Handles the initial user authentication process.
+    /// Presentation Layer: AuthController.
+    /// Cleanest possible implementation. Errors are handled by the Middleware.
     /// </summary>
-    /// <param name="request">The credentials provided by the user.</param>
-    /// <returns>An <see cref="AuthResponse"/> if valid; otherwise, 401 Unauthorized.</returns>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
+        // If this fails, the execution "jumps" directly to the Middleware.
         var response = await authService.LoginAsync(request);
 
-        if (response is null)
-        {
-            return Unauthorized("Invalid credentials.");
-        }
-
+        // If it succeeds, we just return the data.
         return Ok(response);
+    }
+
+    /// <summary>
+    /// Presentation Layer: AuthController.
+    /// Handles registration requests. No try-catch needed due to Middleware.
+    /// </summary>
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        // The framework validates the DTO format before this code runs.
+        // Any business/Identity error during execution will trigger the Middleware.
+        var response = await authService.RegisterAsync(request);
+
+        // Return 201 Created with the authentication tokens.
+        return Created(string.Empty, response);
     }
 
     /// <summary>
@@ -39,11 +50,6 @@ public class AuthController(IAuthService authService) : ControllerBase
     {
         // Now that AuthService has RefreshAsync implemented, the controller just delegates
         var response = await authService.RefreshAsync(request);
-
-        if (response is null)
-        {
-            return Unauthorized("The session has expired or the token is invalid.");
-        }
 
         return Ok(response);
     }

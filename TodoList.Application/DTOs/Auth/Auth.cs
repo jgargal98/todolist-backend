@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TodoList.Application.DTOs.Auth;
 
 /// <summary>
@@ -5,7 +7,16 @@ namespace TodoList.Application.DTOs.Auth;
 /// </summary>
 /// <param name="Email">The user's registered email address.</param>
 /// <param name="Password">The user's plain-text password.</param>
-public record LoginRequest(string Email, string Password);
+public record LoginRequest(
+    [Required, EmailAddress] string Email,
+    [Required] string Password
+);
+
+public record RegisterRequest(
+    [Required, EmailAddress] string Email,
+    [Required] string UserName,
+    [Required] string Password
+);
 
 /// <summary>
 /// Represents the authentication response containing both access and refresh tokens.

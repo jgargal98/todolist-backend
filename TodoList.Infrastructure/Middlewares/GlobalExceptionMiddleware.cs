@@ -56,21 +56,15 @@ public class GlobalExceptionMiddleware
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        // Sets the status code to 500 (Internal Server Error)
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-        // Structured error object to avoid exposing sensitive stack trace info in production
         var response = new
         {
             Status = context.Response.StatusCode,
-            Message = "An unexpected error occurred on the server.",
-            Detail = exception.Message // Note: In a real production environment, you might want to hide this.
+            Message = exception.Message
         };
 
         var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-        var json = JsonSerializer.Serialize(response, options);
-
-        return context.Response.WriteAsync(json);
+        return context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
     }
 }

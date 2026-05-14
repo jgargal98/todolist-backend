@@ -2,24 +2,28 @@ using TodoList.Domain.Entities;
 
 namespace TodoList.Domain.Interfaces;
 
+/// <summary>
+/// Defines the data access contract for User entities using Identity logic.
+/// </summary>
 public interface IUserRepository
 {
-    // The repository always works with Domain Entities
-    // Returns a list of all users (testing)
-    Task<IEnumerable<User>> GetAllAsync();
-
     /// <summary>
-    /// Retrieves a user entity by its email address.
+    /// Retrieves a user by their unique email address.
     /// </summary>
     Task<User?> GetByEmailAsync(string email);
 
     /// <summary>
-    /// Checks if the provided password is valid for the given user.
+    /// Validates user credentials and returns the User object if successful.
     /// </summary>
-    Task<bool> CheckPasswordAsync(User user, string password);
+    Task<User> ValidateCredentialsAsync(string email, string password);
 
     /// <summary>
-    /// Persists changes to the user entity, including security-related fields.
+    /// Creates a new user with the specified password.
+    /// </summary>
+    Task CreateAsync(User user, string password);
+
+    /// <summary>
+    /// Persists changes to an existing user (e.g., updating Refresh Tokens).
     /// </summary>
     Task UpdateAsync(User user);
 }

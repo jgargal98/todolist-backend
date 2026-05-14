@@ -9,76 +9,76 @@ namespace TodoList.Application.Services;
 /// <summary>
 /// Orchestrates authentication flows by interacting with domain abstractions.
 /// </summary>
-public sealed class AuthService : IAuthService
+public sealed class AuthService(IUserRepository userRepository, ITokenProvider jwtProvider) : IAuthService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly ITokenProvider _jwtProvider;
-
-    public AuthService(IUserRepository userRepository, ITokenProvider jwtProvider)
-    {
-        _userRepository = userRepository;
-        _jwtProvider = jwtProvider;
-    }
-
     /// <summary>
-    /// Authenticates a user via email and password.
+    /// Application Layer: AuthService.
+    /// Orchestrates the login process.
     /// </summary>
-    public async Task<AuthResponse?> LoginAsync(LoginRequest request)
+    public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
-        var user = await _userRepository.GetByEmailAsync(request.Email);
+        // If this method throws an exception, the execution stops here 
+        // and bubbles up to the Controller's catch block.
+        var user = await userRepository.ValidateCredentialsAsync(request.Email, request.Password);
 
-        if (user is null || !await _userRepository.CheckPasswordAsync(user, request.Password))
-        {
-            return null;
-        }
-
+        // If we reach this point, credentials are valid.
         return await GenerateAuthResponse(user);
     }
 
     /// <summary>
-    /// Authenticates a user via an expired Access Token and a valid Refresh Token.
+    /// Application Layer: AuthService.
+    /// Coordinates user registration and initial token generation.
+    /// </summary>
+    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
+    {
+        var user = new User
+        {
+            Email = request.Email,
+            UserName = request.UserName
+        };
+
+        // If Identity rules fail, this call throws an exception and stops the flow.
+        await userRepository.CreateAsync(user, request.Password);
+
+        // If we reach this point, registration was successful.
+        // We generate and return the tokens.
+        return await GenerateAuthResponse(user);
+    }
+
+    /// <summary>
+    /// Validates an expired access token and a valid refresh token to issue new ones.
     /// </summary>
     public async Task<AuthResponse?> RefreshAsync(RefreshRequest request)
     {
-        var principal = _jwtProvider.GetPrincipalFromExpiredToken(request.AccessToken);
+        var principal = jwtProvider.GetPrincipalFromExpiredToken(request.AccessToken);
         var email = principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-        if (string.IsNullOrEmpty(email)) return null;
+        if (string.IsNullOrEmpty(email))
+            throw new Exception("Invalid token claims.");
 
-        var user = await _userRepository.GetByEmailAsync(email);
+        var user = await userRepository.GetByEmailAsync(email);
 
-        // Explicit check to satisfy the compiler and ensure domain safety
-        if (user is null || !IsRefreshTokenValid(user, request.RefreshToken))
+        // Validation logic integrated here to avoid redundant private methods
+        if (user is null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
-            return null;
+            throw new Exception("Session expired or invalid refresh token.");
         }
 
-        // Now 'user' is guaranteed to be non-null for GenerateAuthResponse
         return await GenerateAuthResponse(user);
     }
 
     /// <summary>
-    /// Validates if the provided refresh token matches the stored one and is not expired.
-    /// </summary>
-    private bool IsRefreshTokenValid(User? user, string providedToken)
-    {
-        return user is not null &&
-               user.RefreshToken == providedToken &&
-               user.RefreshTokenExpiryTime > DateTime.UtcNow;
-    }
-
-    /// <summary>
-    /// Centralized method to update user state and generate the final DTO.
+    /// Updates user session state and creates the AuthResponse DTO.
     /// </summary>
     private async Task<AuthResponse> GenerateAuthResponse(User user)
     {
-        var accessToken = _jwtProvider.Generate(user);
-        var refreshToken = _jwtProvider.GenerateRefreshToken();
+        var accessToken = jwtProvider.Generate(user);
+        var refreshToken = jwtProvider.GenerateRefreshToken();
 
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
 
-        await _userRepository.UpdateAsync(user);
+        await userRepository.UpdateAsync(user);
 
         return new AuthResponse(accessToken, refreshToken, user.Email!);
     }
