@@ -18,15 +18,15 @@ namespace TodoList.Infrastructure;
 /// </summary>
 /// <remarks>
 /// This class follows the Extension Method pattern to keep the API's Program.cs clean 
-/// and to encapsulate infrastructure details such as Persistence, Identity, and Authentication.
+/// and encapsulates infrastructure details such as Persistence, Identity, and Authentication.
 /// </remarks>
 public static class DependencyInjection
 {
     /// <summary>
-    /// Registers all infrastructure services including Database, Identity, and JWT Authentication.
+    /// Registers all infrastructure services including Database, Identity, and Authentication.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
-    /// <param name="configuration">The application configuration to retrieve settings like connection strings.</param>
+    /// <param name="configuration">The application configuration to retrieve settings.</param>
     /// <returns>The modified <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
@@ -35,7 +35,7 @@ public static class DependencyInjection
             .AddIdentityConfiguration()
             .AddAuthenticationInternal(configuration);
 
-        // Repository Registration
+        // Data Repositories
         services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
@@ -56,7 +56,7 @@ public static class DependencyInjection
     }
 
     /// <summary>
-    /// Sets up ASP.NET Core Identity with custom password requirements.
+    /// Sets up ASP.NET Core Identity with specific security requirements.
     /// </summary>
     private static IServiceCollection AddIdentityConfiguration(this IServiceCollection services)
     {
@@ -73,34 +73,25 @@ public static class DependencyInjection
     }
 
     /// <summary>
-    /// Configures JWT-based authentication and token validation parameters.
+    /// Configures JWT-based authentication and links the Token Provider.
     /// </summary>
     private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services, IConfiguration configuration)
     {
-        // Bind JWT settings from appsettings.json to the JwtOptions class
-        services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
-        services.AddScoped<IJwtProvider, JwtProvider>();
 
+        // Bind JWT settings to the Options pattern
+        services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+        services.ConfigureOptions<JwtSetup>();
+
+        // Register the token generation service (Domain Interface -> Infra Implementation)
+        services.AddScoped<ITokenProvider, JwtProvider>();
+
+        // Set up the Authentication Middleware
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["Jwt:Issuer"],
-                ValidAudience = configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ??
-                    throw new InvalidOperationException("Jwt SecretKey not found.")))
-            };
-        });
+        .AddJwtBearer();
 
         return services;
     }

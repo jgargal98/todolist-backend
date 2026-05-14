@@ -12,7 +12,7 @@ namespace TodoList.Infrastructure.Authentication;
 /// <summary>
 /// Infrastructure implementation for JWT and Refresh Token handling.
 /// </summary>
-public sealed class JwtProvider : IJwtProvider
+public sealed class JwtProvider : ITokenProvider
 {
     private readonly JwtOptions _options;
 

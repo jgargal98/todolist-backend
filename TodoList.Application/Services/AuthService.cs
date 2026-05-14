@@ -12,9 +12,9 @@ namespace TodoList.Application.Services;
 public sealed class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
-    private readonly IJwtProvider _jwtProvider;
+    private readonly ITokenProvider _jwtProvider;
 
-    public AuthService(IUserRepository userRepository, IJwtProvider jwtProvider)
+    public AuthService(IUserRepository userRepository, ITokenProvider jwtProvider)
     {
         _userRepository = userRepository;
         _jwtProvider = jwtProvider;

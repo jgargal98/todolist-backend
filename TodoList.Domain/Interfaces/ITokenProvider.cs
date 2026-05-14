@@ -6,7 +6,7 @@ namespace TodoList.Domain.Interfaces;
 /// <summary>
 /// Defines the contract for JWT operations and token validation.
 /// </summary>
-public interface IJwtProvider
+public interface ITokenProvider
 {
     /// <summary>
     /// Generates a signed JSON Web Token for the specified user.
