@@ -24,6 +24,14 @@ public class JwtSetup(IConfiguration configuration) : IConfigureNamedOptions<Jwt
     /// <param name="options">The options instance to configure.</param>
     public void Configure(JwtBearerOptions options)
     {
+        // 1. Get the Public Key from configuration
+        string publicKeyPem = configuration["Jwt:PublicKey"]
+            ?? throw new InvalidOperationException("JWT PublicKey not found in configuration.");
+
+        // 2. Create the RSA object and import the PEM key
+        var rsa = System.Security.Cryptography.RSA.Create();
+        rsa.ImportFromPem(publicKeyPem);
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -32,9 +40,9 @@ public class JwtSetup(IConfiguration configuration) : IConfigureNamedOptions<Jwt
             ValidateIssuerSigningKey = true,
             ValidIssuer = configuration["Jwt:Issuer"],
             ValidAudience = configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ??
-                throw new InvalidOperationException("Jwt SecretKey not found.")))
+
+            // 3. Use RsaSecurityKey instead of SymmetricSecurityKey
+            IssuerSigningKey = new RsaSecurityKey(rsa)
         };
     }
 }

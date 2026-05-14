@@ -5,7 +5,8 @@ namespace TodoList.Infrastructure.Authentication;
 /// </summary>
 public class JwtOptions
 {
-    public string Issuer { get; init; } = string.Empty;
-    public string Audience { get; init; } = string.Empty;
-    public string SecretKey { get; init; } = string.Empty;
+    public string PrivateKey { get; set; } = string.Empty;
+    public string PublicKey { get; set; } = string.Empty;
+    public string Issuer { get; set; } = string.Empty;
+    public string Audience { get; set; } = string.Empty;
 }
