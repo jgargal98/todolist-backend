@@ -32,7 +32,7 @@ public static class DependencyInjection
     {
         services
             .AddPersistence(configuration)
-            .AddIdentityConfiguration()
+            .AddIdentityConfiguration(configuration)
             .AddAuthenticationInternal(configuration);
 
         // Data Repositories
@@ -58,16 +58,14 @@ public static class DependencyInjection
     /// <summary>
     /// Sets up ASP.NET Core Identity with specific security requirements.
     /// </summary>
-    private static IServiceCollection AddIdentityConfiguration(this IServiceCollection services)
+    private static IServiceCollection AddIdentityConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddIdentity<User, IdentityRole>(options =>
-        {
-            options.Password.RequireDigit = true;
-            options.Password.RequiredLength = 6;
-            options.Password.RequireNonAlphanumeric = false;
-        })
-        .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
+        // Bind settings directly from JSON
+        services.Configure<IdentityOptions>(configuration.GetSection("IdentityOptions"));
+
+        services.AddIdentity<User, IdentityRole>()
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
 
         return services;
     }
