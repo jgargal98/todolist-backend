@@ -26,4 +26,9 @@ public interface IUserRepository
     /// Persists changes to an existing user (e.g., updating Refresh Tokens).
     /// </summary>
     Task UpdateAsync(User user);
+
+    /// <summary>
+    /// Gets a list of all registered users.
+    /// </summary>
+    Task<IEnumerable<User>> GetAllAsync();
 }
