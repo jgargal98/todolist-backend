@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
 
-namespace TodoList.Infrastructure.Middlewares;
+namespace TodoList.API.Middlewares;
 
 /// <summary>
 /// Custom middleware designed to catch and handle unhandled exceptions globally 
@@ -56,7 +54,7 @@ public class GlobalExceptionMiddleware
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
         var response = new
         {
