@@ -68,6 +68,8 @@ Data/
  Migrations/
   20260513104705_InitialCreate.cs
   20260513104705_InitialCreate.Designer.cs
+  20260519104950_ChangeTaskStatusToInt.cs
+  20260519104950_ChangeTaskStatusToInt.Designer.cs
   AppDbContextModelSnapshot.cs
 DbInitializer.cs
 DependencyInjection.cs
@@ -75,7 +77,9 @@ obj/Debug/net10.0/
  .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
  TodoList.Infrastructure.AssemblyInfo.cs
  TodoList.Infrastructure.GlobalUsings.g.cs
-Repositories/UserRepository.cs
+Repositories/
+ TaskRepository.cs
+ UserRepository.cs
 
 [metadataReferences]
 ../

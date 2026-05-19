@@ -56,9 +56,11 @@ TemporaryDependencyNodeTargetIdentifier=net10.0
 [sourceFiles]
 DTOs/
  Auth/Auth.cs
+ Task/CreateTaskRequest.cs
  User/UserResponseDto.cs
 Interfaces/
  IAuthService.cs
+ ITaskService.cs
  IUserService.cs
 Mappings/
  CategoryProfile.cs
@@ -72,6 +74,7 @@ obj/Debug/net10.0/
 Services/
  AuthService.cs
  DependencyInjection.cs
+ TaskService.cs
  UserService.cs
 
 [metadataReferences]
