@@ -1,4 +1,6 @@
 using TodoList.Application.DTOs.Auth;
+using TodoList.Domain.Entities;
+
 
 namespace TodoList.Application.Interfaces;
 
@@ -19,9 +21,12 @@ public interface IAuthService
     /// A <see cref="AuthResponse"/> containing the JWT and refresh token if successful; 
     /// otherwise, <see langword="null"/>.
     /// </returns>
-    Task<AuthResponse> LoginAsync(LoginRequest request);
+    Task<User?> LoginAsync(LoginRequest request);
 
-    Task<AuthResponse> RegisterAsync(RegisterRequest request);
+    /// <summary>
+    /// Register a new user
+    /// </summary>
+    Task<User?> RegisterAsync(RegisterRequest request);
 
     /// <summary>
     /// Generates a new access token using a valid refresh token.
@@ -31,5 +36,10 @@ public interface IAuthService
     /// A new <see cref="AuthResponse"/> with updated tokens if the refresh token is valid; 
     /// otherwise, <see langword="null"/>.
     /// </returns>
-    Task<AuthResponse?> RefreshAsync(RefreshRequest request);
+    Task<AuthResponse?> RefreshTokenAsync(RefreshRequest request);
+
+    /// <summary>
+    /// Generates a new access token.
+    /// </summary>
+    Task<AuthResponse?> GenerateAuthResponse(User user);
 }

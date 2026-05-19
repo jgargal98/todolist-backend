@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using TodoList.Application.DTOs.Auth;
+using Microsoft.AspNetCore.Mvc;
 using TodoList.Application.Interfaces;
 
 namespace TodoList.API.Controllers;
@@ -18,10 +18,14 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        // If this fails, the execution "jumps" directly to the Middleware.
-        var response = await authService.LoginAsync(request);
+        var user = await authService.LoginAsync(request);
 
-        // If it succeeds, we just return the data.
+        if (user is null)
+        {
+            return Unauthorized(new { message = "Invalid email or password." });
+        }
+
+        var response = await authService.GenerateAuthResponse(user);
         return Ok(response);
     }
 
@@ -32,12 +36,26 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        // The framework validates the DTO format before this code runs.
-        // Any business/Identity error during execution will trigger the Middleware.
-        var response = await authService.RegisterAsync(request);
+        try
+        {
+            // Attempt to register
+            var user = await authService.RegisterAsync(request);
 
-        // Return 201 Created with the authentication tokens.
-        return Created(string.Empty, response);
+            // Handle the null case (Email already taken)
+            if (user is null)
+            {
+                return Conflict(new { message = "User with this email already exists." });
+            }
+
+            // If successful, generate tokens
+            var response = await authService.GenerateAuthResponse(user);
+            return CreatedAtAction(nameof(Login), response);
+        }
+        catch (Exception ex)
+        {
+            // Catch the exception thrown by the service and return the error message
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -48,9 +66,16 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
     {
-        // Now that AuthService has RefreshAsync implemented, the controller just delegates
-        var response = await authService.RefreshAsync(request);
+        // Attempt to refresh the session using the provided token
+        var response = await authService.RefreshTokenAsync(request);
 
+        if (response is null)
+        {
+            // Return 401 if the token is invalid, expired, or doesn't match any user
+            return Unauthorized(new { message = "Invalid or expired refresh token." });
+        }
+
+        // Return the new pair of tokens (Access Token + New Refresh Token)
         return Ok(response);
     }
 }

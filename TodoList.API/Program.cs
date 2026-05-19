@@ -2,7 +2,7 @@ using TodoList.Infrastructure;
 using TodoList.Application.Services;
 using Microsoft.OpenApi;
 using TodoList.Application.Mappings;
-using TodoList.Infrastructure.Middlewares;
+using TodoList.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 

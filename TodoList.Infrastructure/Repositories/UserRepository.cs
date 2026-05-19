@@ -30,21 +30,13 @@ public class UserRepository(UserManager<User> userManager) : IUserRepository
     /// Infrastructure Layer: UserRepository.
     /// Validates user credentials using Identity UserManager.
     /// </summary>
-    public async Task<User> ValidateCredentialsAsync(string email, string password)
+    public async Task<User?> ValidateCredentialsAsync(string email, string password)
     {
-        // 1. Check if the user exists
         var user = await userManager.FindByEmailAsync(email);
-        if (user is null)
-        {
-            // Throwing specific messages that will be caught by the Controller
-            throw new Exception("The email address does not exist.");
-        }
 
-        // 2. Check if the password is correct
-        var isPasswordValid = await userManager.CheckPasswordAsync(user, password);
-        if (!isPasswordValid)
+        if (user is null || !await userManager.CheckPasswordAsync(user, password))
         {
-            throw new Exception("The password provided is incorrect.");
+            return null;
         }
 
         return user;
@@ -54,18 +46,10 @@ public class UserRepository(UserManager<User> userManager) : IUserRepository
     /// Infrastructure Layer: UserRepository.
     /// Creates a new user and handles Identity-specific validation results.
     /// </summary>
-    public async Task CreateAsync(User user, string password)
+    public async Task<bool> CreateAsync(User user, string password)
     {
         var result = await userManager.CreateAsync(user, password);
-
-        if (!result.Succeeded)
-        {
-            // Extract all error descriptions from Identity (e.g., "Email already taken")
-            var errorMessages = string.Join(" | ", result.Errors.Select(e => e.Description));
-
-            // This exception will be intercepted by the ExceptionHandlingMiddleware
-            throw new Exception(errorMessages);
-        }
+        return result.Succeeded;
     }
 
     /// <summary>
@@ -74,14 +58,10 @@ public class UserRepository(UserManager<User> userManager) : IUserRepository
     /// <param name="user">The user entity with updated values.</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     /// <exception cref="Exception">Thrown when the update operation fails in the database.</exception>
-    public async Task UpdateAsync(User user)
+    public async Task<bool> UpdateAsync(User user)
     {
         var result = await userManager.UpdateAsync(user);
-        if (!result.Succeeded)
-        {
-            var errorMessages = string.Join(" ", result.Errors.Select(e => e.Description));
-            throw new Exception(errorMessages);
-        }
+        return result.Succeeded;
     }
 
     /// <summary>
