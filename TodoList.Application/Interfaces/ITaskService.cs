@@ -15,4 +15,12 @@ public interface ITaskService
     /// <param name="request">The data context used to build the new task.</param>
     /// <returns>A task that represents the asynchronous operation, containing the created <see cref="TaskItem"/>.</returns>
     Task<TaskResponse?> CreateTaskAsync(string userId, CreateTaskRequest request);
+
+    /// <summary>
+    /// Deletes a specific task ensuring it belongs to the authenticated user.
+    /// </summary>
+    /// <param name="taskId">The unique identifier of the task.</param>
+    /// <param name="userId">The unique identifier of the user requesting deletion.</param>
+    /// <returns>True if the task was successfully deleted; otherwise, false.</returns>
+    Task<bool> DeleteTaskAsync(Guid taskId, string userId);
 }

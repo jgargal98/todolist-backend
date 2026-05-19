@@ -47,4 +47,31 @@ public class TasksController(ITaskService taskService) : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    /// <summary>
+    /// HTTP DELETE endpoint to remove an existing task.
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteTask(Guid id)
+    {
+        // Retrieve the authenticated user ID extracted from JWT claims
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(new { message = "Authentication context identity is missing." });
+        }
+
+        // Request the service layer to validate ownership and delete the resource
+        var success = await taskService.DeleteTaskAsync(id, userId);
+
+        if (!success)
+        {
+            // Return 404 Not Found if the task doesn't exist or doesn't belong to the user
+            return NotFound(new { message = $"Task with ID {id} was not found or access is denied." });
+        }
+
+        // Return 204 No Content to indicate successful processing without a payload
+        return NoContent();
+    }
 }

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using TodoList.Domain.Entities;
 using TodoList.Domain.Interfaces;
 using TodoList.Infrastructure.Data;
@@ -16,6 +17,36 @@ public class TaskRepository(AppDbContext context) : ITaskRepository
     {
         // 1. Append the task entity to the context tracking state
         var result = await context.Tasks.AddAsync(task);
+
+        // 2. Persist to SQL Server. If it fails or throws, your Controller's try-catch handles it.
+        await context.SaveChangesAsync();
+
+        // 3. Return true to signal that the infrastructure execution completed successfully
+        return true;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<TaskItem>> GetByUserIdAsync(string userId)
+    {
+        // Eagerly load the SubTasks collection to prevent lazy-loading issues during processing
+        return await context.Tasks
+            .Include(t => t.SubTasks)
+            .Where(t => t.UserId == userId)
+            .ToListAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        // Locate the task within the database context tracking memory or storage
+        var task = await context.Tasks.FindAsync(id);
+        if (task is null)
+        {
+            return false;
+        }
+
+        // Remove the entry. Relational cascade paths will clean up associated SubTasks
+        context.Tasks.Remove(task);
 
         // 2. Persist to SQL Server. If it fails or throws, your Controller's try-catch handles it.
         await context.SaveChangesAsync();

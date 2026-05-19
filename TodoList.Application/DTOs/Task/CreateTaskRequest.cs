@@ -24,5 +24,5 @@ public class CreateTaskRequest
 public class CreateSubTaskRequest
 {
     public string Title { get; set; } = string.Empty;
-    public bool IsCompleted { get; set; } = false;
+    public bool IsDone { get; set; } = false;
 }
