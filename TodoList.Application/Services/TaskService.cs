@@ -102,4 +102,22 @@ public sealed class TaskService(
 
         return true;
     }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<TaskResponse>> GetTasksByUserIdAsync(string userId)
+    {
+        // 1. Fetch database domain entities using the infrastructure layer repository.
+        // The repository eagerly loads (.Include) the child subtasks collection efficiently.
+        var tasks = await taskRepository.GetByUserIdAsync(userId);
+
+        // 2. Prevent null reference exceptions downstream by returning an empty collection placeholder if data is missing.
+        if (tasks is null)
+        {
+            return Enumerable.Empty<TaskResponse>();
+        }
+
+        // 3. Transform the domain graph collection into plain, serializable response DTO structures.
+        // AutoMapper maps the inner elements automatically based on the rules declared inside TaskProfile.
+        return mapper.Map<IEnumerable<TaskResponse>>(tasks);
+    }
 }

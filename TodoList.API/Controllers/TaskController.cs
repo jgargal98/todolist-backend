@@ -49,6 +49,30 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
 
     /// <summary>
+    /// HTTP GET endpoint to retrieve the complete list of tasks belonging to the calling user context.
+    /// </summary>
+    /// <returns>
+    /// A HTTP 200 OK status containing the array collection of <see cref="TaskResponse"/> data payloads.
+    /// </returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<TaskResponse>), 200)]
+    public async Task<IActionResult> GetTasksFromUser()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(new { message = "Authentication context identity is missing." });
+        }
+
+        // Query the underlying domain data layers through the boundary service orchestration
+        var response = await taskService.GetTasksByUserIdAsync(userId);
+
+        // Return a standard successful operational payload. Missing records will correctly display an empty JSON array ([])
+        return Ok(response);
+    }
+
+    /// <summary>
     /// HTTP DELETE endpoint to remove an existing task.
     /// </summary>
     [HttpDelete("{id:guid}")]

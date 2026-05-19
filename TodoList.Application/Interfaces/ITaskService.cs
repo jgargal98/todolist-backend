@@ -23,4 +23,11 @@ public interface ITaskService
     /// <param name="userId">The unique identifier of the user requesting deletion.</param>
     /// <returns>True if the task was successfully deleted; otherwise, false.</returns>
     Task<bool> DeleteTaskAsync(Guid taskId, string userId);
+
+    /// <summary>
+    /// Retrieves all tasks assigned to a specific user and maps them into safe response DTOs.
+    /// </summary>
+    /// <param name="userId">The unique identifier string of the authenticated resource owner.</param>
+    /// <returns>A collection of mapped <see cref="TaskResponse"/> objects matching the user identity.</returns>
+    Task<IEnumerable<TaskResponse>> GetTasksByUserIdAsync(string userId);
 }
