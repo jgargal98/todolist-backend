@@ -1,3 +1,4 @@
+using AutoMapper;
 using TodoList.Application.DTOs.Task;
 using TodoList.Application.Interfaces;
 using TodoList.Domain.Entities;
@@ -5,9 +6,16 @@ using TodoList.Domain.Interfaces;
 
 namespace TodoList.Application.Services;
 
-public sealed class TaskService(ITaskRepository taskRepository, IUserRepository userRepository) : ITaskService
+public sealed class TaskService(
+    ITaskRepository taskRepository,
+    IUserRepository userRepository,
+    IMapper mapper) : ITaskService
 {
-    public async Task<TaskItem?> CreateTaskAsync(string userId, CreateTaskRequest request)
+    /// <summary>
+    /// Validates the request data, creates a new task with its subtasks, 
+    /// persists it into the database, and returns a sanitized response DTO.
+    /// </summary>
+    public async Task<TaskResponse?> CreateTaskAsync(string userId, CreateTaskRequest request)
     {
         // 1. Check if the user exists in SQL Server
         var users = await userRepository.GetAllAsync();
@@ -66,6 +74,7 @@ public sealed class TaskService(ITaskRepository taskRepository, IUserRepository 
             throw new Exception("Database error: Could not record task into SQL Server.");
         }
 
-        return newTask;
+        // 8. Map domain entity to response DTO to avoid circular reference object cycles
+        return mapper.Map<TaskResponse>(newTask);
     }
 }

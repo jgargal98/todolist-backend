@@ -14,5 +14,5 @@ public interface ITaskService
     /// <param name="userId">The unique identifier of the authenticated user.</param>
     /// <param name="request">The data context used to build the new task.</param>
     /// <returns>A task that represents the asynchronous operation, containing the created <see cref="TaskItem"/>.</returns>
-    Task<TaskItem?> CreateTaskAsync(string userId, CreateTaskRequest request);
+    Task<TaskResponse?> CreateTaskAsync(string userId, CreateTaskRequest request);
 }

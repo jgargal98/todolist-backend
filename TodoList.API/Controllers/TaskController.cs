@@ -30,17 +30,16 @@ public class TasksController(ITaskService taskService) : ControllerBase
                 return Unauthorized(new { message = "Authentication context identity is missing." });
             }
 
-            // Fire the application service layer containing our business constraints
-            var task = await taskService.CreateTaskAsync(userId, request);
+            // The service now returns a sanitized TaskResponse DTO, preventing object cycles
+            var response = await taskService.CreateTaskAsync(userId, request);
 
-            // Catch business verification failures (invalid user or status out of range 1-5)
-            if (task is null)
+            if (response is null)
             {
-                return BadRequest(new { message = "Invalid data payload. Ensure status is between 1 and 5 and user context exists." });
+                return BadRequest(new { message = "Invalid data payload. Check constraints." });
             }
 
-            // Return 201 Created alongside metadata route telemetry
-            return CreatedAtAction(nameof(Create), new { id = task.Id }, task);
+            // Return a standard 200 OK
+            return Ok(response);
         }
         catch (Exception ex)
         {
