@@ -65,10 +65,19 @@ public sealed class TaskService(
         }
 
         // Apply incoming mapped data directly onto the domain entity properties
+        // Dentro de tu método UpdateTaskAsync en TaskService.cs
         task.Title = request.Title;
         task.Description = request.Description;
         task.DueDate = request.DueDate;
         task.Status = request.Status;
+        task.CategoryId = request.CategoryId;
+
+        // Subtasks mapping
+        task.SubTasks = request.SubTasks.Select(subTaskDto => new SubTask
+        {
+            Title = subTaskDto.Title,
+            IsDone = subTaskDto.IsDone
+        }).ToList();
 
         // Persist modified entity state variables within the database context
         return await taskRepository.UpdateAsync(task);

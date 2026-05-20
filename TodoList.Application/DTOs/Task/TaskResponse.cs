@@ -7,6 +7,7 @@ public class TaskResponse
     public string? Description { get; set; }
     public DateTime? DueDate { get; set; }
     public int Status { get; set; }
+    public Guid? CategoryId { get; set; }
     public List<SubTaskResponse> SubTasks { get; set; } = new();
 }
 

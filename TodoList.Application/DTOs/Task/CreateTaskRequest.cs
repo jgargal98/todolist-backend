@@ -1,8 +1,10 @@
+using System;
+using System.Collections.Generic;
+
 namespace TodoList.Application.DTOs.Task;
 
-
 /// <summary>
-/// Data Transfer Object for creating a task, including its initial status and subtasks payload.
+/// Data Transfer Object for creating a task, including its initial status, category, and subtasks payload.
 /// </summary>
 public class CreateTaskRequest
 {
