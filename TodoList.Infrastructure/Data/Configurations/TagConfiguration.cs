@@ -34,6 +34,11 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
         builder.Property(t => t.UserId)
             .IsRequired();
 
+        builder.HasOne(t => t.User)
+        .WithMany(u => u.Tags)
+        .HasForeignKey(t => t.UserId)
+        .OnDelete(DeleteBehavior.ClientCascade);
+
         /// <summary>
         /// Relationship Mapping: Many-to-Many
         /// Configures the relationship between Tags and Tasks.
@@ -42,12 +47,5 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
         builder.HasMany(t => t.Tasks)
             .WithMany(tk => tk.Tags)
             .UsingEntity(j => j.ToTable("TaskTags"));
-
-        // Relationship: One User owns many Tags
-        // Security boundary ensuring cascading deletes if the user is removed
-        builder.HasOne<User>()
-            .WithMany()
-            .HasForeignKey(t => t.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

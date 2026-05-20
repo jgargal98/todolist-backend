@@ -47,6 +47,6 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.HasOne(t => t.Category)
             .WithMany(c => c.Tasks)
             .HasForeignKey(t => t.CategoryId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.ClientSetNull);
     }
 }

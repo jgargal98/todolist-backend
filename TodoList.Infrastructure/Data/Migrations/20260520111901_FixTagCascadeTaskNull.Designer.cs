@@ -12,8 +12,8 @@ using TodoList.Infrastructure.Data;
 namespace TodoList.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260520095155_CleanTagEntityAnnotations")]
-    partial class CleanTagEntityAnnotations
+    [Migration("20260520111901_FixTagCascadeTaskNull")]
+    partial class FixTagCascadeTaskNull
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -409,7 +409,7 @@ namespace TodoList.Infrastructure.Data.Migrations
                     b.HasOne("TodoList.Domain.Entities.User", "User")
                         .WithMany("Tags")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("User");

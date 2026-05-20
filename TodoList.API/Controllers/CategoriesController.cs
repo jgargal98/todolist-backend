@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TodoList.Application.DTOs.Category;
-using TodoList.Application.Interfaces.Services;
+using TodoList.Application.Interfaces;
 
 namespace TodoList.API.Controllers;
 
