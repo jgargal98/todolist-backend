@@ -406,7 +406,7 @@ namespace TodoList.Infrastructure.Data.Migrations
                     b.HasOne("TodoList.Domain.Entities.User", "User")
                         .WithMany("Tags")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("User");

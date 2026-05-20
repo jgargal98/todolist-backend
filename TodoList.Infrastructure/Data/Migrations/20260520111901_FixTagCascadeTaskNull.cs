@@ -5,7 +5,7 @@
 namespace TodoList.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class CleanTagEntityAnnotations : Migration
+    public partial class FixTagCascadeTaskNull : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,8 +40,7 @@ namespace TodoList.Infrastructure.Data.Migrations
                 table: "Tags",
                 column: "UserId",
                 principalTable: "AspNetUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />

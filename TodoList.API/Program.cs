@@ -5,6 +5,7 @@ using TodoList.Application.Mappings;
 using TodoList.API.Middlewares;
 using TodoList.API.Validation.Auth;
 using TodoList.API.Validation.Task;
+using TodoList.API.Validation.Category;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -26,6 +27,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryRequestValidator>();
 
 /// <summary>
 /// Configure CORS using an environment variable for better security.
