@@ -1,45 +1,24 @@
 using TodoList.Application.DTOs.Auth;
-using TodoList.Domain.Entities;
-
 
 namespace TodoList.Application.Interfaces;
 
 /// <summary>
-/// Defines the contract for authentication and authorization services.
+/// Defines the application layer contract for managing authentication processes.
 /// </summary>
-/// <remarks>
-/// This service handles the business logic for user identity verification 
-/// and the management of security tokens.
-/// </remarks>
 public interface IAuthService
 {
     /// <summary>
-    /// Authenticates a user based on provided credentials.
+    /// Validates credentials and generates session tokens for a user.
     /// </summary>
-    /// <param name="request">The login request containing email and password.</param>
-    /// <returns>
-    /// A <see cref="AuthResponse"/> containing the JWT and refresh token if successful; 
-    /// otherwise, <see langword="null"/>.
-    /// </returns>
-    Task<User?> LoginAsync(LoginRequest request);
+    Task<AuthResponse?> LoginAsync(LoginRequest request);
 
     /// <summary>
-    /// Register a new user
+    /// Creates a new user and generates their initial session tokens.
     /// </summary>
-    Task<User?> RegisterAsync(RegisterRequest request);
+    Task<AuthResponse?> RegisterAsync(RegisterRequest request);
 
     /// <summary>
-    /// Generates a new access token using a valid refresh token.
+    /// Validates an expired access token and security keys to rotate session tokens.
     /// </summary>
-    /// <param name="request">The request containing the expired access token and valid refresh token.</param>
-    /// <returns>
-    /// A new <see cref="AuthResponse"/> with updated tokens if the refresh token is valid; 
-    /// otherwise, <see langword="null"/>.
-    /// </returns>
     Task<AuthResponse?> RefreshTokenAsync(RefreshRequest request);
-
-    /// <summary>
-    /// Generates a new access token.
-    /// </summary>
-    Task<AuthResponse?> GenerateAuthResponse(User user);
 }

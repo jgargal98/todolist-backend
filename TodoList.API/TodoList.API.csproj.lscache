@@ -59,6 +59,7 @@ Controllers/
  AuthController.cs
  ExceptionController.cs
  HelloWorldController.cs
+ TaskController.cs
  UsersController.cs
 Middlewares/GlobalExceptionMiddleware.cs
 obj/Debug/net10.0/

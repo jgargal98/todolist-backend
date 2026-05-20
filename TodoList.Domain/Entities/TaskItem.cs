@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace TodoList.Domain.Entities;
 
 /// <summary>
@@ -18,7 +15,7 @@ public class TaskItem
     public DateTime? DueDate { get; set; }
 
     /// <summary>Mapped to 'status' in ERD</summary>
-    public TaskStatus Status { get; set; } = TaskStatus.Pending;
+    public int Status { get; set; } = 1;
 
     /// <summary>
     /// Stored as JSON in the database as per ERD 'subTask: JSON'.

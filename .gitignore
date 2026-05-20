@@ -59,3 +59,6 @@ nunit-*.xml
 # personal script
 init.bat
 *.lscache
+
+# testing
+Tests/

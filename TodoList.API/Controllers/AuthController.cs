@@ -12,70 +12,79 @@ namespace TodoList.API.Controllers;
 public class AuthController(IAuthService authService) : ControllerBase
 {
     /// <summary>
-    /// Presentation Layer: AuthController.
-    /// Cleanest possible implementation. Errors are handled by the Middleware.
+    /// Authenticates a user and returns the corresponding access and refresh tokens.
     /// </summary>
+    /// <param name="request">The login request containing user credentials.</param>
+    /// <returns>An <see cref="IActionResult"/> with the <see cref="AuthResponse"/> if successful; otherwise, 401 Unauthorized or 500 Internal Server Error.</returns>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await authService.LoginAsync(request);
-
-        if (user is null)
+        try
         {
-            return Unauthorized(new { message = "Invalid email or password." });
-        }
+            // The service now handles both validation and token generation internally.
+            var response = await authService.LoginAsync(request);
 
-        var response = await authService.GenerateAuthResponse(user);
-        return Ok(response);
+            if (response is null)
+            {
+                return Unauthorized(new { message = "Invalid email or password." });
+            }
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during login.", details = ex.Message });
+        }
     }
 
     /// <summary>
-    /// Presentation Layer: AuthController.
-    /// Handles registration requests. No try-catch needed due to Middleware.
+    /// Registers a new user and immediately generates their initial session tokens.
     /// </summary>
+    /// <param name="request">The registration request containing email and password.</param>
+    /// <returns>An <see cref="IActionResult"/> with the created <see cref="AuthResponse"/>; otherwise, 409 Conflict or 400 Bad Request.</returns>
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         try
         {
-            // Attempt to register
-            var user = await authService.RegisterAsync(request);
+            // The service registers the user and returns the tokens in a single database roundtrip.
+            var response = await authService.RegisterAsync(request);
 
-            // Handle the null case (Email already taken)
-            if (user is null)
+            if (response is null)
             {
                 return Conflict(new { message = "User with this email already exists." });
             }
 
-            // If successful, generate tokens
-            var response = await authService.GenerateAuthResponse(user);
             return CreatedAtAction(nameof(Login), response);
         }
         catch (Exception ex)
         {
-            // Catch the exception thrown by the service and return the error message
             return BadRequest(new { message = ex.Message });
         }
     }
 
     /// <summary>
-    /// Exchanges an expired access token for a new pair of tokens.
+    /// Exchanges an expired access token for a new pair of tokens using a valid refresh token.
     /// </summary>
-    /// <param name="request">The expired JWT and valid Refresh Token.</param>
-    /// <returns>A new <see cref="AuthResponse"/> if the session is valid; otherwise, 401 Unauthorized.</returns>
+    /// <param name="request">The refresh request containing the expired access token and valid refresh token.</param>
+    /// <returns>An <see cref="IActionResult"/> with the new <see cref="AuthResponse"/>; otherwise, 401 Unauthorized or 400 Bad Request.</returns>
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
     {
-        // Attempt to refresh the session using the provided token
-        var response = await authService.RefreshTokenAsync(request);
-
-        if (response is null)
+        try
         {
-            // Return 401 if the token is invalid, expired, or doesn't match any user
-            return Unauthorized(new { message = "Invalid or expired refresh token." });
-        }
+            var response = await authService.RefreshTokenAsync(request);
 
-        // Return the new pair of tokens (Access Token + New Refresh Token)
-        return Ok(response);
+            if (response is null)
+            {
+                return Unauthorized(new { message = "Invalid or expired refresh token." });
+            }
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Error processing refresh token.", details = ex.Message });
+        }
     }
 }

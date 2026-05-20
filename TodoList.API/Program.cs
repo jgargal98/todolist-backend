@@ -3,6 +3,10 @@ using TodoList.Application.Services;
 using Microsoft.OpenApi;
 using TodoList.Application.Mappings;
 using TodoList.API.Middlewares;
+using TodoList.API.Validation.Auth;
+using TodoList.API.Validation.Task;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +21,11 @@ builder.Services.AddControllers();
 //Dependency Injection for every service and config
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+//Dependency Injection for FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
 
 /// <summary>
 /// Configure CORS using an environment variable for better security.

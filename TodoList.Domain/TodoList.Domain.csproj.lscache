@@ -61,6 +61,7 @@ Entities/
  TaskSupport.cs
  User.cs
 Interfaces/
+ ITaskRepository.cs
  ITokenProvider.cs
  IUserRepository.cs
 obj/Debug/net10.0/
