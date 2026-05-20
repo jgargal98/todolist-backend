@@ -7,7 +7,7 @@ using TodoList.Domain.Interfaces;
 namespace TodoList.Application.Services;
 
 /// <summary>
-/// Core sealed application service implementing business validation and transactional workflows for tasks.
+/// Core sealed application service implementing transactional workflows and data orchestration for tasks.
 /// </summary>
 public sealed class TaskService(
     ITaskRepository taskRepository,
@@ -24,31 +24,7 @@ public sealed class TaskService(
             return null;
         }
 
-        // 2. Validate Text Constraints: Non-empty titles bound to 100 character thresholds
-        if (string.IsNullOrWhiteSpace(request.Title) || request.Title.Length > 100)
-        {
-            return null;
-        }
-
-        // 3. Validate Status State Fields: Strictly bounded between codes 1 and 5
-        if (request.Status < 1 || request.Status > 5)
-        {
-            return null;
-        }
-
-        // 4. Validate Temporal Targets: Restrict due dates from representing past points in time
-        if (request.DueDate.HasValue && request.DueDate.Value < DateTime.UtcNow)
-        {
-            return null;
-        }
-
-        // 5. Validate Child Collections: Reject execution if any subtask title is invalid
-        if (request.SubTasks.Any(st => string.IsNullOrWhiteSpace(st.Title)))
-        {
-            return null;
-        }
-
-        // 6. Map sanitized structural strings directly into a pristine Domain Entity instance
+        // 2. Map sanitized structural strings directly into a pristine Domain Entity instance
         var newTask = new TaskItem
         {
             Id = Guid.NewGuid(),
@@ -64,7 +40,7 @@ public sealed class TaskService(
             }).ToList()
         };
 
-        // 7. Call infrastructure storage repository layer to commit structural entities
+        // 3. Call infrastructure storage repository layer to commit structural entities
         var registered = await taskRepository.AddAsync(newTask);
 
         if (!registered)
@@ -72,7 +48,7 @@ public sealed class TaskService(
             throw new Exception("Database error: Could not record task into SQL Server.");
         }
 
-        // 8. Transform Domain Graph to simple DTO to fully break serialization loops
+        // 4. Transform Domain Graph to simple DTO to fully break serialization loops
         return mapper.Map<TaskResponse>(newTask);
     }
 
@@ -86,7 +62,7 @@ public sealed class TaskService(
             return false;
         }
 
-        // 2. Locate targeted element within the isolated domain query response
+        // 2. Locate targeted element within the isolated domain query response using LINQ Method Syntax
         var taskToDelete = userTasks.FirstOrDefault(t => t.Id == taskId);
         if (taskToDelete is null)
         {
@@ -107,7 +83,6 @@ public sealed class TaskService(
     public async Task<IEnumerable<TaskResponse>> GetTasksByUserIdAsync(string userId)
     {
         // 1. Fetch database domain entities using the infrastructure layer repository.
-        // The repository eagerly loads (.Include) the child subtasks collection efficiently.
         var tasks = await taskRepository.GetByUserIdAsync(userId);
 
         // 2. Prevent null reference exceptions downstream by returning an empty collection placeholder if data is missing.
@@ -117,7 +92,6 @@ public sealed class TaskService(
         }
 
         // 3. Transform the domain graph collection into plain, serializable response DTO structures.
-        // AutoMapper maps the inner elements automatically based on the rules declared inside TaskProfile.
         return mapper.Map<IEnumerable<TaskResponse>>(tasks);
     }
 }
