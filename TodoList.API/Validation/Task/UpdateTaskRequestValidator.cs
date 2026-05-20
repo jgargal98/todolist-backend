@@ -1,7 +1,7 @@
 using FluentValidation;
 using TodoList.Application.DTOs.Task;
 
-namespace TodoList.API.Validation;
+namespace TodoList.API.Validation.Task;
 
 /// <summary>
 /// Enforces business data integrity rules and payload constraints for updating task entities.

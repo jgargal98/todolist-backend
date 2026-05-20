@@ -1,8 +1,7 @@
 using FluentValidation;
 using TodoList.Application.DTOs.Auth;
 
-namespace TodoList.API.Validation;
-
+namespace TodoList.API.Validation.Auth;
 /// <summary>
 /// Enforces data integrity, credentials formatting, and password complexity criteria during registration.
 /// </summary>

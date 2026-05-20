@@ -1,7 +1,7 @@
 using FluentValidation;
 using TodoList.Application.DTOs.Auth;
 
-namespace TodoList.API.Validation;
+namespace TodoList.API.Validation.Auth;
 
 /// <summary>
 /// Validates token rotation payloads to ensure strings are structurally sound.

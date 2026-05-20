@@ -1,7 +1,7 @@
 using FluentValidation;
 using TodoList.Application.DTOs.Task;
 
-namespace TodoList.API.Validation;
+namespace TodoList.API.Validation.Task;
 
 /// <summary>
 /// Strongly-typed validator enforcing business rules on the CreateTaskRequest DTO payload.

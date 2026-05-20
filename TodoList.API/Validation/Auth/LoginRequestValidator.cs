@@ -1,7 +1,7 @@
 using FluentValidation;
 using TodoList.Application.DTOs.Auth;
 
-namespace TodoList.API.Validation;
+namespace TodoList.API.Validation.Auth;
 
 /// <summary>
 /// Gatekeeper validator ensuring login payloads are fully populated before running database queries.
