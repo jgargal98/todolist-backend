@@ -60,5 +60,5 @@ nunit-*.xml
 init.bat
 *.lscache
 
-# testing
+# testings
 Tests/
