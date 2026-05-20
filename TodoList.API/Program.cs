@@ -5,6 +5,7 @@ using TodoList.Application.Mappings;
 using TodoList.API.Middlewares;
 using TodoList.API.Validation;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 //Dependency Injection for FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
 /// <summary>
