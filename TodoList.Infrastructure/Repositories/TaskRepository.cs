@@ -25,6 +25,31 @@ public class TaskRepository(AppDbContext context) : ITaskRepository
         return true;
     }
 
+    /// <summary>
+    /// Persists state modifications of a tracked task entity into the database.
+    /// </summary>
+    /// <param name="task">The modified task entity instance.</param>
+    /// <returns><c>true</c> if one or more database rows were affected; otherwise, <c>false</c>.</returns>
+    public async Task<bool> UpdateAsync(TaskItem task)
+    {
+        var result = context.Tasks.Update(task);
+        // 2. Persist to SQL Server. If it fails or throws, your Controller's try-catch handles it.
+        await context.SaveChangesAsync();
+
+        // 3. Return true to signal that the infrastructure execution completed successfully
+        return true;
+    }
+
+    /// <summary>
+    /// Fetches a specific task entity by its tracking identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the task.</param>
+    /// <returns>The matching <see cref="TaskEntity"/> if found; otherwise, <c>null</c>.</returns>
+    public async Task<TaskItem?> GetByIdAsync(Guid id)
+    {
+        return await context.Tasks.FindAsync(id);
+    }
+
     /// <inheritdoc />
     public async Task<IEnumerable<TaskItem>> GetByUserIdAsync(string userId)
     {

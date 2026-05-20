@@ -14,6 +14,10 @@ public interface ITaskRepository
     /// <returns><c>true</c> if the database insert operation succeeds; otherwise, <c>false</c>.</returns>
     Task<bool> AddAsync(TaskItem task);
 
+    Task<bool> UpdateAsync(TaskItem task);
+
+    Task<TaskItem?> GetByIdAsync(Guid id);
+
     /// <summary>
     /// Retrieves all tasks assigned to a specific user, including related child subtasks.
     /// </summary>

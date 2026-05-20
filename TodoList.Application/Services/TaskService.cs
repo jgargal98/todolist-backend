@@ -53,6 +53,28 @@ public sealed class TaskService(
     }
 
     /// <inheritdoc />
+    public async Task<bool> UpdateTaskAsync(Guid taskId, string userId, UpdateTaskRequest request)
+    {
+        // Retrieve the domain tracking entity directly from the persistence repository
+        var task = await taskRepository.GetByIdAsync(taskId);
+
+        // Security Validation Boundary: Ensure the task exists and belongs to the current request context user
+        if (task == null || task.UserId != userId)
+        {
+            return false;
+        }
+
+        // Apply incoming mapped data directly onto the domain entity properties
+        task.Title = request.Title;
+        task.Description = request.Description;
+        task.DueDate = request.DueDate;
+        task.Status = request.Status;
+
+        // Persist modified entity state variables within the database context
+        return await taskRepository.UpdateAsync(task);
+    }
+
+    /// <inheritdoc />
     public async Task<bool> DeleteTaskAsync(Guid taskId, string userId)
     {
         // 1. Fetch only collection groups mapped to the requesting owner ID

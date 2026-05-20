@@ -15,6 +15,14 @@ public interface ITaskService
     /// <param name="request">The data context used to build the new task.</param>
     /// <returns>A task that represents the asynchronous operation, containing the created <see cref="TaskItem"/>.</returns>
     Task<TaskResponse?> CreateTaskAsync(string userId, CreateTaskRequest request);
+    /// <summary>
+    /// Validates ownership constraints and updates task properties within the data store.
+    /// </summary>
+    /// <param name="taskId">The unique identifier of the target task.</param>
+    /// <param name="userId">The unique identifier of the requesting user.</param>
+    /// <param name="request">The modified property values.</param>
+    /// <returns><c>true</c> if the task was found, owned by the user, and successfully updated; otherwise, <c>false</c>.</returns>
+    Task<bool> UpdateTaskAsync(Guid taskId, string userId, UpdateTaskRequest request);
 
     /// <summary>
     /// Deletes a specific task ensuring it belongs to the authenticated user.

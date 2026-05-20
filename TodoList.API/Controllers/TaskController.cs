@@ -73,6 +73,39 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
 
     /// <summary>
+    /// Updates an existing task after verifying resource existence and user ownership.
+    /// </summary>
+    /// <param name="id">The unique identifier (GUID) of the task to update.</param>
+    /// <param name="request">The updated task data payload.</param>
+    /// <returns>
+    /// 204 No Content if successful; 
+    /// 401 Unauthorized if the user claim is missing; 
+    /// 404 Not Found if the task does not exist or belongs to another user.
+    /// </returns>
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTaskRequest request)
+    {
+        // Extract the unique identifier of the authenticated user from JWT Claims
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(new { message = "Authentication context identity is missing." });
+        }
+
+        // Process the update through the application service layer
+        var isUpdated = await taskService.UpdateTaskAsync(id, userId, request);
+
+        if (!isUpdated)
+        {
+            // Return 404 to prevent resource enumeration leaks regarding tasks owned by other users
+            return NotFound(new { message = "The requested task was not found, or you do not have permission to modify it." });
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
     /// HTTP DELETE endpoint to remove an existing task.
     /// </summary>
     [HttpDelete("{id:guid}")]
