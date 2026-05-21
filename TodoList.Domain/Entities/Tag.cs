@@ -8,7 +8,7 @@ public class Tag
     /// <summary>
     /// Unique identifier for the tag entity.
     /// </summary>
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     /// <summary>
     /// The descriptive name of the tag.

@@ -7,13 +7,12 @@ namespace TodoList.Infrastructure.Data;
 /// <summary>
 /// Database context for the application, managing Identity and Domain entities mapping.
 /// </summary>
-public class AppDbContext : IdentityDbContext<User>
+/// <remarks>
+/// Initializes a new instance of the AppDbContext.
+/// </remarks>
+/// <param name="options">The options to be used by a DbContext.</param>
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
 {
-    /// <summary>
-    /// Initializes a new instance of the AppDbContext.
-    /// </summary>
-    /// <param name="options">The options to be used by a DbContext.</param>
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     /// <summary>
     /// Gets or sets the Tasks table.
