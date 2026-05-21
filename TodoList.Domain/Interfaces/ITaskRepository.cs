@@ -26,6 +26,11 @@ public interface ITaskRepository
     Task<IEnumerable<TaskItem>> GetByUserIdAsync(string userId);
 
     /// <summary>
+    /// Fetches a specific task entity along with its complete relational Tag subgraph.
+    /// </summary>
+    Task<TaskItem?> GetByIdWithTagsAsync(Guid id, string userId);
+
+    /// <summary>
     /// Removes a task record from the persistence context by its unique identifier.
     /// </summary>
     /// <param name="id">The explicit tracking GUID of the target task row.</param>

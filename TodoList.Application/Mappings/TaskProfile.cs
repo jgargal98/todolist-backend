@@ -1,4 +1,5 @@
 using AutoMapper;
+using TodoList.Application.DTOs.Tag;
 using TodoList.Application.DTOs.Task;
 using TodoList.Domain.Entities;
 
@@ -16,5 +17,7 @@ public class TaskProfile : Profile
 
         // Map configuration for SubTask to SubTaskResponse
         CreateMap<SubTask, SubTaskResponse>();
+
+        CreateMap<Tag, TagResponse>();
     }
 }

@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TodoList.Domain.Entities;
 using TodoList.Domain.Interfaces;
@@ -6,10 +5,7 @@ using TodoList.Infrastructure.Data;
 
 namespace TodoList.Infrastructure.Repositories;
 
-/// <summary>
-/// Infrastructure Layer: TaskRepository.
-/// Implements data access operations for tasks using Entity Framework Core.
-/// </summary>
+/// <inheritdoc />
 public class TaskRepository(AppDbContext context) : ITaskRepository
 {
     /// <inheritdoc />
@@ -25,11 +21,7 @@ public class TaskRepository(AppDbContext context) : ITaskRepository
         return true;
     }
 
-    /// <summary>
-    /// Persists state modifications of a tracked task entity into the database.
-    /// </summary>
-    /// <param name="task">The modified task entity instance.</param>
-    /// <returns><c>true</c> if one or more database rows were affected; otherwise, <c>false</c>.</returns>
+    /// <inheritdoc />
     public async Task<bool> UpdateAsync(TaskItem task)
     {
         var result = context.Tasks.Update(task);
@@ -40,14 +32,18 @@ public class TaskRepository(AppDbContext context) : ITaskRepository
         return true;
     }
 
-    /// <summary>
-    /// Fetches a specific task entity by its tracking identifier.
-    /// </summary>
-    /// <param name="id">The unique identifier of the task.</param>
-    /// <returns>The matching <see cref="TaskEntity"/> if found; otherwise, <c>null</c>.</returns>
+    /// <inheritdoc />
     public async Task<TaskItem?> GetByIdAsync(Guid id)
     {
         return await context.Tasks.FindAsync(id);
+    }
+
+    /// <inheritdoc />
+    public async Task<TaskItem?> GetByIdWithTagsAsync(Guid id, string userId)
+    {
+        return await context.Tasks
+            .Include(t => t.Tags)
+            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
     }
 
     /// <inheritdoc />
@@ -56,6 +52,7 @@ public class TaskRepository(AppDbContext context) : ITaskRepository
         // Eagerly load the SubTasks collection to prevent lazy-loading issues during processing
         return await context.Tasks
             .Include(t => t.SubTasks)
+            .Include(t => t.Tags)
             .Where(t => t.UserId == userId)
             .ToListAsync();
     }

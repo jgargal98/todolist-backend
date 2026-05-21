@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace TodoList.Application.DTOs.Task;
 
 /// <summary>
@@ -18,6 +15,9 @@ public class CreateTaskRequest
 
     /// <summary>Optional collection of subtasks to be embedded as JSON.</summary>
     public List<CreateSubTaskRequest> SubTasks { get; set; } = new();
+
+    /// <summary>Optional collection of tags.</summary>
+    public List<Guid> TagIds { get; set; } = new();
 }
 
 /// <summary>

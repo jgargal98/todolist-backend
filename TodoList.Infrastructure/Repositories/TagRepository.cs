@@ -27,6 +27,15 @@ public class TagRepository(AppDbContext context) : ITagRepository
     }
 
     /// <inheritdoc />
+    public async Task<IEnumerable<Tag>> GetTagsByIdsAsync(List<Guid> tagIds, string userId)
+    {
+        // The LINQ Contains operator evaluates efficiently as a SQL 'WHERE Id IN (...)' clause combined with multi-tenancy filters
+        return await context.Tags
+            .Where(t => tagIds.Contains(t.Id) && t.UserId == userId)
+            .ToListAsync();
+    }
+
+    /// <inheritdoc />
     public async Task<bool> AddAsync(Tag tag)
     {
         // 1. Append the tag entity to the context tracking state

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace TodoList.Application.DTOs.Task;
 
 /// <summary>
@@ -12,7 +9,8 @@ public record UpdateTaskRequest(
     DateTime? DueDate,
     int Status,
     Guid? CategoryId,
-    List<UpdateSubTaskRequest> SubTasks
+    List<UpdateSubTaskRequest> SubTasks,
+    List<Guid> TagIds
 );
 
 /// <summary>

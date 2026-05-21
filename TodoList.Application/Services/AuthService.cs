@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using TodoList.Application.DTOs.Auth;
 using TodoList.Application.Interfaces;
 using TodoList.Domain.Entities;
