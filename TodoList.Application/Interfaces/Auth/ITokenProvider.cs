@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using TodoList.Domain.Entities;
 
-namespace TodoList.Domain.Interfaces;
+namespace TodoList.Application.Interfaces;
 
 /// <summary>
 /// Defines the contract for JWT operations and token validation.

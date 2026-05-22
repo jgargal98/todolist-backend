@@ -1,6 +1,6 @@
 using TodoList.Domain.Entities;
 
-namespace TodoList.Domain.Interfaces;
+namespace TodoList.Application.Interfaces;
 
 /// <summary>
 /// Domain Layer: ITagRepository.

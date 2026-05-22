@@ -1,7 +1,6 @@
 using AutoMapper;
 using TodoList.Application.DTOs.User;
 using TodoList.Application.Interfaces;
-using TodoList.Domain.Interfaces;
 
 namespace TodoList.Application.Services;
 

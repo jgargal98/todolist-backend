@@ -1,7 +1,6 @@
 using TodoList.Application.DTOs.Auth;
 using TodoList.Application.Interfaces;
 using TodoList.Domain.Entities;
-using TodoList.Domain.Interfaces;
 
 namespace TodoList.Application.Services;
 

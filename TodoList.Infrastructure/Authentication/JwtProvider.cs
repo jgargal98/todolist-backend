@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TodoList.Domain.Entities;
-using TodoList.Domain.Interfaces;
+using TodoList.Application.Interfaces;
 
 namespace TodoList.Infrastructure.Authentication;
 

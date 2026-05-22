@@ -1,6 +1,6 @@
 using TodoList.Domain.Entities;
 
-namespace TodoList.Domain.Interfaces;
+namespace TodoList.Application.Interfaces;
 
 /// <summary>
 /// Defines data persistence contracts and database operations for TaskItem entities.

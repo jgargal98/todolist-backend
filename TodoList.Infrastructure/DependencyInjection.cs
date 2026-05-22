@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TodoList.Domain.Entities;
-using TodoList.Domain.Interfaces;
+using TodoList.Application.Interfaces;
 using TodoList.Infrastructure.Authentication;
 using TodoList.Infrastructure.Data;
 using TodoList.Infrastructure.Repositories;
