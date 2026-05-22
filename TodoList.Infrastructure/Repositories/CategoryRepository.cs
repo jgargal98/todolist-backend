@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TodoList.Domain.Interfaces;
+using TodoList.Application.Interfaces;
 using TodoList.Domain.Entities;
 using TodoList.Infrastructure.Data;
 

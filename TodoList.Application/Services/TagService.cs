@@ -2,7 +2,6 @@ using AutoMapper;
 using TodoList.Application.DTOs.Tag;
 using TodoList.Application.Interfaces;
 using TodoList.Domain.Entities;
-using TodoList.Domain.Interfaces;
 
 namespace TodoList.Application.Services;
 

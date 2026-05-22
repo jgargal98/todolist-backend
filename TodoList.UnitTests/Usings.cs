@@ -12,4 +12,3 @@ global using TodoList.Application.DTOs.User;
 global using TodoList.Application.Interfaces;
 global using TodoList.Application.Services;
 global using TodoList.Domain.Entities;
-global using TodoList.Domain.Interfaces;

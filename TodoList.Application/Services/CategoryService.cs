@@ -1,6 +1,5 @@
 using AutoMapper;
 using TodoList.Application.DTOs.Category;
-using TodoList.Domain.Interfaces;
 using TodoList.Application.Interfaces;
 using TodoList.Domain.Entities;
 

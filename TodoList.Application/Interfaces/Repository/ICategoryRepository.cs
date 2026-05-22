@@ -1,6 +1,6 @@
 using TodoList.Domain.Entities;
 
-namespace TodoList.Domain.Interfaces;
+namespace TodoList.Application.Interfaces;
 
 /// <summary>
 /// Defines the infrastructure data access contract for managing Category domain entities.
