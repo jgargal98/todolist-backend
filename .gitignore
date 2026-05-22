@@ -59,7 +59,3 @@ nunit-*.xml
 # personal script
 init.bat
 *.lscache
-
-# testings
-Tests/
-TodoList.UnitTests/

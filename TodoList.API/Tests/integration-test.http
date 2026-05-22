@@ -1,0 +1,123 @@
+### =================================================================
+### ENVIRONMENT CONFIGURATION AND GLOBAL VARIABLES
+### =================================================================
+@hostname = localhost
+@port = 5124
+@baseUrl = http://{{hostname}}:{{port}}/api
+@contentType = application/json
+
+### NOTE: Replace these values with real IDs from your Database for relational tests
+@existingCategoryId = ec727474-3356-446f-bac2-2cffbbaa640b
+@validTagId1 = 9c5e4f68-6b12-4915-9845-eafd2686b270
+@validTagId2 = 8d1b76d5-ccc4-45b1-9673-edb8e1a02cbe
+
+
+### =================================================================
+### 1. AUTHENTICATION (Get JWT Token)
+### =================================================================
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "developer2026@example.com",
+  "password": "SecurePassword123!"
+}
+
+### DYNAMIC VARIABLES EXTRACTED FROM LOGIN
+@authToken = {{login.response.body.accessToken}}
+
+
+### =================================================================
+### 2. CREATE A NEW TASK (With Subtasks and Optional Tags)
+### =================================================================
+# @name createTask
+POST {{baseUrl}}/tasks
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Integration Task Example",
+  "description": "Upload corrected repositories ready for production",
+  "dueDate": "2026-05-25T18:00:00Z",
+  "status": 1,
+  "subTasks": [
+    {
+      "title": "Fix ITagRepository",
+      "isDone": true
+    },
+    {
+      "title": "Write HTTP integration tests",
+      "isDone": false
+    }
+  ],
+  "tagIds": [
+    "{{validTagId1}}"
+  ]
+}
+
+### CAPTURE THE CREATED TASK ID FOR SUBSEQUENT ENDPOINTS
+@createdTaskId = {{createTask.response.body.id}}
+
+
+### =================================================================
+### 3. GET ALL TASKS FOR THE AUTHENTICATED USER
+### =================================================================
+GET {{baseUrl}}/tasks
+Authorization: Bearer {{authToken}}
+
+### =================================================================
+### 4. UPDATE THE TASK (Modify data and Sync Tags)
+### =================================================================
+### In this request we remove the second tag (validTagId2).
+### The service will execute an automatic DELETE on the SQL Server intermediate table.
+PUT {{baseUrl}}/tasks/{{createdTaskId}}
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Updated integration task",
+  "description": "Update description here",
+  "dueDate": "2026-05-26T12:00:00Z",
+  "status": 2,
+  "categoryId": "{{existingCategoryId}}",
+  "subTasks": [
+    {
+      "title": "Fix ITagRepository",
+      "isDone": true
+    },
+    {
+      "title": "Write HTTP integration tests",
+      "isDone": true
+    }
+  ],
+  "tagIds": [
+    "{{validTagId2}}"
+  ]
+}
+
+
+### =================================================================
+### 5. ERROR CASE: ATTEMPT TO ASSOCIATE NON-EXISTENT OR CROSS-USER TAGS
+### =================================================================
+### Must return HTTP 400 BadRequest enforcing multi-tenant security.
+POST {{baseUrl}}/tasks
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Hacker Attack Task",
+  "description": "Attempting to inject random IDs",
+  "status": 1,
+  "subTasks": [],
+  "tagIds": [
+    "00000000-0000-0000-0000-000000000000"
+  ]
+}
+
+
+### =================================================================
+### 6. DELETE THE CREATED TASK (Cascading cleanup)
+### =================================================================
+DELETE {{baseUrl}}/tasks/{{createdTaskId}}
+Authorization: Bearer {{authToken}}
