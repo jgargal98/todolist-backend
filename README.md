@@ -115,8 +115,6 @@ The database schema is designed to handle user authentication and relational not
 
     The API starts at `http://localhost:5124`. Swagger UI is available at `http://localhost:5124/swagger`.
 
-4. **Reset the local database** (optional): run `init.bat` — this stops LocalDB, deletes the database files, restores packages, and launches the API.
-
 ### Default Admin Account
 
 On first run, the application seeds an admin user:
