@@ -153,7 +153,7 @@ public sealed class TaskService(
         task.Tags.Clear();
 
         // Short-circuit execution if incoming payload collection is unassigned or empty (Optional Requirement)
-        if (tagIds is null || !tagIds.Any())
+        if (tagIds is null || tagIds.Count == 0)
         {
             return true;
         }
@@ -162,7 +162,9 @@ public sealed class TaskService(
         var validTags = await tagRepository.GetTagsByIdsAsync(tagIds, userId);
 
         // Security boundary assessment: catch cross-tenant data manipulations or unknown identities
-        if (validTags.Count() != tagIds.Count)
+        var requestedTagIds = tagIds.Distinct().ToHashSet();
+        var returnedTagIds = validTags.Select(t => t.Id).ToHashSet();
+        if (!requestedTagIds.SetEquals(returnedTagIds))
         {
             return false;
         }
