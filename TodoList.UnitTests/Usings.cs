@@ -1,0 +1,15 @@
+global using System.Security.Claims;
+global using AutoMapper;
+global using FluentValidation;
+global using FluentValidation.TestHelper;
+global using Microsoft.AspNetCore.Identity;
+global using Moq;
+global using TodoList.Application.DTOs.Auth;
+global using TodoList.Application.DTOs.Category;
+global using TodoList.Application.DTOs.Tag;
+global using TodoList.Application.DTOs.Task;
+global using TodoList.Application.DTOs.User;
+global using TodoList.Application.Interfaces;
+global using TodoList.Application.Services;
+global using TodoList.Domain.Entities;
+global using TodoList.Domain.Interfaces;
