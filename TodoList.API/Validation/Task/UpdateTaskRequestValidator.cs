@@ -8,6 +8,7 @@ namespace TodoList.API.Validation.Task;
 /// </summary>
 public class UpdateTaskRequestValidator : AbstractValidator<UpdateTaskRequest>
 {
+    /// <summary>Defines validation rules for task update requests.</summary>
     public UpdateTaskRequestValidator()
     {
         // 1. Title Constraints

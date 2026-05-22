@@ -14,8 +14,18 @@ public interface ITaskRepository
     /// <returns><c>true</c> if the database insert operation succeeds; otherwise, <c>false</c>.</returns>
     Task<bool> AddAsync(TaskItem task);
 
+    /// <summary>
+    /// Persists state modifications of a tracked task entity into the database.
+    /// </summary>
+    /// <param name="task">The modified task entity instance.</param>
+    /// <returns><c>true</c> if the update succeeds; otherwise, <c>false</c>.</returns>
     Task<bool> UpdateAsync(TaskItem task);
 
+    /// <summary>
+    /// Retrieves a task entity by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the task.</param>
+    /// <returns>The matching <see cref="TaskItem"/> if found; otherwise, <c>null</c>.</returns>
     Task<TaskItem?> GetByIdAsync(Guid id);
 
     /// <summary>

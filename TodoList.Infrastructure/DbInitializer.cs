@@ -30,7 +30,8 @@ public static class DbInitializer
         await context.Database.MigrateAsync();
 
         // Seeds default administrative data
-        await SeedDefaultUserAsync(userManager);
+        // It won't override current user thanks to check
+        // await SeedDefaultUserAsync(userManager);
     }
 
     /// <summary>

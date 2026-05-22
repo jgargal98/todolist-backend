@@ -18,6 +18,8 @@ public record UpdateTaskRequest(
 /// </summary>
 public class UpdateSubTaskRequest
 {
+    /// <summary>Updated title of the subtask.</summary>
     public string Title { get; set; } = string.Empty;
-    public bool IsDone { get; set; } = false; // <-- Acoplado a tu estándar 'IsDone'
+    /// <summary>Updated completion state of the subtask.</summary>
+    public bool IsDone { get; set; } = false;
 }

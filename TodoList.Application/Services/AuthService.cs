@@ -10,11 +10,7 @@ namespace TodoList.Application.Services;
 /// </summary>
 public sealed class AuthService(IUserRepository userRepository, ITokenProvider jwtProvider) : IAuthService
 {
-    /// <summary>
-    /// Validates user credentials and produces an authentication response if successful.
-    /// </summary>
-    /// <param name="request">The login request details.</param>
-    /// <returns>An <see cref="AuthResponse"/> containing the generated tokens; otherwise, null.</returns>
+    /// <inheritdoc />
     public async Task<AuthResponse?> LoginAsync(LoginRequest request)
     {
         var user = await userRepository.ValidateCredentialsAsync(request.Email, request.Password);
@@ -27,12 +23,7 @@ public sealed class AuthService(IUserRepository userRepository, ITokenProvider j
         return await GenerateAuthResponse(user);
     }
 
-    /// <summary>
-    /// Registers a unique user and produces an initial authentication response.
-    /// </summary>
-    /// <param name="request">The user registration data.</param>
-    /// <returns>An <see cref="AuthResponse"/> containing the initial tokens; otherwise, null if the email is taken.</returns>
-    /// <exception cref="Exception">Thrown when the data repository fails to insert the user record.</exception>
+    /// <inheritdoc />
     public async Task<AuthResponse?> RegisterAsync(RegisterRequest request)
     {
         var existingUser = await userRepository.GetByEmailAsync(request.Email);
@@ -56,11 +47,7 @@ public sealed class AuthService(IUserRepository userRepository, ITokenProvider j
         return await GenerateAuthResponse(newUser);
     }
 
-    /// <summary>
-    /// Validates the current token state and rotates the session credentials.
-    /// </summary>
-    /// <param name="request">The token refresh payload.</param>
-    /// <returns>A new <see cref="AuthResponse"/> with rotated tokens; otherwise, null.</returns>
+    /// <inheritdoc />
     public async Task<AuthResponse?> RefreshTokenAsync(RefreshRequest request)
     {
         var principal = jwtProvider.GetPrincipalFromExpiredToken(request.AccessToken);

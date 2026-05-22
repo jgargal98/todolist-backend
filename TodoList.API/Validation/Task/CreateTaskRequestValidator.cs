@@ -8,6 +8,7 @@ namespace TodoList.API.Validation.Task;
 /// </summary>
 public class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>
 {
+    /// <summary>Defines validation rules for task creation requests.</summary>
     public CreateTaskRequestValidator()
     {
         // Rule for Title: Cannot be empty, must be trimmed implicitly, max 100 characters

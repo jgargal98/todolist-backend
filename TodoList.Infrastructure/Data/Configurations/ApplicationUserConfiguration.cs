@@ -10,6 +10,7 @@ namespace TodoList.Infrastructure.Data.Configurations;
 /// </summary>
 public class ApplicationUserConfiguration : IEntityTypeConfiguration<User>
 {
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<User> builder)
     {
         // Identity handles most properties (Email, Password, etc.)

@@ -13,10 +13,7 @@ namespace TodoList.Infrastructure.Data.Configurations;
 /// </remarks>
 public class TagConfiguration : IEntityTypeConfiguration<Tag>
 {
-    /// <summary>
-    /// Configures the database mapping for the Tag entity.
-    /// </summary>
-    /// <param name="builder">The builder to be used to configure the entity type.</param>
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<Tag> builder)
     {
         // Table name mapping
@@ -39,11 +36,7 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
         .HasForeignKey(t => t.UserId)
         .OnDelete(DeleteBehavior.ClientCascade);
 
-        /// <summary>
-        /// Relationship Mapping: Many-to-Many
-        /// Configures the relationship between Tags and Tasks.
-        /// A join table named "TaskTags" is automatically managed by EF Core.
-        /// </summary>
+        // Many-to-Many: join table "TaskTags" is auto-managed by EF Core
         builder.HasMany(t => t.Tasks)
             .WithMany(tk => tk.Tags)
             .UsingEntity(j => j.ToTable("TaskTags"));
