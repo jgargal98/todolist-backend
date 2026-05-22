@@ -10,6 +10,7 @@ namespace TodoList.Infrastructure.Data.Configurations;
 /// </summary>
 public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
 {
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<TaskItem> builder)
     {
         builder.ToTable("Tasks");

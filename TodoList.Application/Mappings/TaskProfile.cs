@@ -4,6 +4,7 @@ using TodoList.Domain.Entities;
 
 namespace TodoList.Application.Mappings;
 
+/// <summary>AutoMapper profile for Task entity to DTO mappings.</summary>
 public class TaskProfile : Profile
 {
     /// <summary>

@@ -8,6 +8,7 @@ namespace TodoList.API.Validation.Auth;
 /// </summary>
 public class LoginRequestValidator : AbstractValidator<LoginRequest>
 {
+    /// <summary>Defines validation rules for login requests.</summary>
     public LoginRequestValidator()
     {
         RuleFor(x => x.Email)

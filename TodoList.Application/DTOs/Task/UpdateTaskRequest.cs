@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace TodoList.Application.DTOs.Task;
 
 /// <summary>
@@ -20,6 +17,8 @@ public record UpdateTaskRequest(
 /// </summary>
 public class UpdateSubTaskRequest
 {
+    /// <summary>Updated title of the subtask.</summary>
     public string Title { get; set; } = string.Empty;
+    /// <summary>Updated completion state of the subtask.</summary>
     public bool IsDone { get; set; } = false;
 }

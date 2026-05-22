@@ -12,12 +12,12 @@ namespace TodoList.Infrastructure.Authentication;
 /// </summary>
 public class JwtSetup(IConfiguration configuration) : IConfigureNamedOptions<JwtBearerOptions>
 {
+    /// <summary>Delegates configuration to the named overload regardless of the scheme name.</summary>
     public void Configure(string? name, JwtBearerOptions options)
     {
-        // It simply redirects the call to the actual logic
-        // regardless of the name ("Bearer", "Custom", etc.)
         Configure(options);
     }
+
     /// <summary>
     /// Configures the JWT validation parameters using settings from appsettings.json.
     /// </summary>

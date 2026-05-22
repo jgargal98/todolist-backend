@@ -8,6 +8,7 @@ namespace TodoList.Application.Validators.Tag;
 /// </summary>
 public class CreateTagRequestValidator : AbstractValidator<CreateTagRequest>
 {
+    /// <summary>Defines validation rules for tag creation requests.</summary>
     public CreateTagRequestValidator()
     {
         RuleFor(x => x.Name)

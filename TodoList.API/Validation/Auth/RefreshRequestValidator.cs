@@ -8,6 +8,7 @@ namespace TodoList.API.Validation.Auth;
 /// </summary>
 public class RefreshRequestValidator : AbstractValidator<RefreshRequest>
 {
+    /// <summary>Defines validation rules for token refresh requests.</summary>
     public RefreshRequestValidator()
     {
         // Access token must be present (it's the expired JWT string)

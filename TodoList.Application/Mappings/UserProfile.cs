@@ -9,6 +9,7 @@ namespace TodoList.Application.Mappings;
 /// </summary>
 public class UserProfile : Profile
 {
+    /// <summary>Initializes the mapping configuration for User to UserResponseDto.</summary>
     public UserProfile()
     {
         // Maps ApplicationUser (Database) to UserResponseDto (API Output)

@@ -10,6 +10,7 @@ namespace TodoList.Infrastructure.Data.Configurations;
 /// </summary>
 public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<Category> builder)
     {
         builder.ToTable("Categories");

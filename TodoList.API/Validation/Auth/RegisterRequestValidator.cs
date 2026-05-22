@@ -7,6 +7,7 @@ namespace TodoList.API.Validation.Auth;
 /// </summary>
 public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 {
+    /// <summary>Defines validation rules for user registration requests.</summary>
     public RegisterRequestValidator()
     {
         // 1. Email Constraints
