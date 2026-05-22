@@ -28,9 +28,4 @@ public record UserResponseDto
     /// Gets the unique display name or handle of the user.
     /// </summary>
     public required string UserName { get; init; }
-
-    /// <summary>
-    /// Gets the total count of tasks associated with this user.
-    /// </summary>
-    public int TotalTasks { get; init; }
 }
