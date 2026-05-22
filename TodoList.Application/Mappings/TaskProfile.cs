@@ -18,6 +18,7 @@ public class TaskProfile : Profile
         // Map configuration for SubTask to SubTaskResponse
         CreateMap<SubTask, SubTaskResponse>();
 
+        // Tag mapping needed for TaskItem.Tags navigation property
         CreateMap<Tag, TagResponse>();
     }
 }
