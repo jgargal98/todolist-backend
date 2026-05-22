@@ -9,7 +9,8 @@ public record UpdateTaskRequest(
     DateTime? DueDate,
     int Status,
     Guid? CategoryId,
-    List<UpdateSubTaskRequest> SubTasks
+    List<UpdateSubTaskRequest> SubTasks,
+    List<Guid> TagIds
 );
 
 /// <summary>

@@ -1,3 +1,5 @@
+using TodoList.Application.DTOs.Tag;
+
 namespace TodoList.Application.DTOs.Task;
 
 /// <summary>Data transfer object representing a task for API responses.</summary>
@@ -17,6 +19,7 @@ public class TaskResponse
     public Guid? CategoryId { get; set; }
     /// <summary>Collection of subtasks embedded in the response.</summary>
     public List<SubTaskResponse> SubTasks { get; set; } = new();
+    public List<TagResponse> Tags { get; set; } = new();
 }
 
 /// <summary>Data transfer object representing a subtask within a task response.</summary>
