@@ -21,5 +21,5 @@ public record UpdateTaskRequest(
 public class UpdateSubTaskRequest
 {
     public string Title { get; set; } = string.Empty;
-    public bool IsDone { get; set; } = false; // <-- Acoplado a tu estándar 'IsDone'
+    public bool IsDone { get; set; } = false;
 }

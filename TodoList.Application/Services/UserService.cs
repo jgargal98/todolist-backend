@@ -16,10 +16,7 @@ public class UserService : IUserService
         _mapper = mapper;
     }
 
-    /// <summary>
-    /// Fetches all users from the repository and maps them to UserResponseDto
-    /// </summary>
-    /// <returns>A list of data transfer objects representing users</returns>
+    /// <inheritdoc />
     public async Task<IEnumerable<UserResponseDto>> GetUsersAsync()
     {
         // 1. Get entities from the Infrastructure layer (Repository)

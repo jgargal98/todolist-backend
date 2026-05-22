@@ -65,7 +65,7 @@ public sealed class TaskService(
         }
 
         // Apply incoming mapped data directly onto the domain entity properties
-        // Dentro de tu método UpdateTaskAsync en TaskService.cs
+        // Map incoming data onto the domain entity
         task.Title = request.Title;
         task.Description = request.Description;
         task.DueDate = request.DueDate;

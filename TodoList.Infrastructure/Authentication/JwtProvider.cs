@@ -22,11 +22,7 @@ public sealed class JwtProvider : ITokenProvider
     /// <param name="options">The JWT settings injected via IOptions.</param>
     public JwtProvider(IOptions<JwtOptions> options) => _options = options.Value;
 
-    /// <summary>
-    /// Generates a JWT for a specific user signed with the RSA Private Key.
-    /// </summary>
-    /// <param name="user">The user entity for which the token is being generated.</param>
-    /// <returns>A signed JWT string using the RS256 algorithm.</returns>
+    /// <inheritdoc />
     public string Generate(User user)
     {
         var claims = new List<Claim>
@@ -54,10 +50,7 @@ public sealed class JwtProvider : ITokenProvider
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    /// <summary>
-    /// Generates a cryptographically strong random string to be used as a Refresh Token.
-    /// </summary>
-    /// <returns>A Base64 encoded string representing the refresh token.</returns>
+    /// <inheritdoc />
     public string GenerateRefreshToken()
     {
         var randomNumber = new byte[64];
@@ -66,12 +59,7 @@ public sealed class JwtProvider : ITokenProvider
         return Convert.ToBase64String(randomNumber);
     }
 
-    /// <summary>
-    /// Validates an expired token and retrieves the <see cref="ClaimsPrincipal"/>.
-    /// This is used during the Refresh Token flow.
-    /// </summary>
-    /// <param name="token">The expired or nearly expired JWT.</param>
-    /// <returns>The principal if the token is valid (ignoring expiration); otherwise, null.</returns>
+    /// <inheritdoc />
     public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
         var rsa = RSA.Create();
