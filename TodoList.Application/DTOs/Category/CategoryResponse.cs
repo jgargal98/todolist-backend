@@ -1,5 +1,3 @@
-using System;
-
 namespace TodoList.Application.DTOs.Category;
 
 /// <summary>Data transfer object representing a category for API responses.</summary>
