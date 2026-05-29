@@ -25,7 +25,14 @@ public class UpdateTaskRequestValidator : AbstractValidator<UpdateTaskRequest>
             .Must(status => status >= 1 && status <= 5)
             .WithMessage("Task status must be a valid integer code between 1 and 5.");
 
-        // 4. Due Date Constraints
+        // 4. Subtask Constraints
+        RuleForEach(x => x.SubTasks).ChildRules(subTask =>
+        {
+            subTask.RuleFor(st => st.Title)
+                .NotEmpty().WithMessage("Every individual subtask must contain a valid title.");
+        });
+
+        // 5. Due Date Constraints
         RuleFor(x => x.DueDate)
             .Must(date => !date.HasValue || date.Value > DateTime.UtcNow)
             .WithMessage("The specified task due date must be set in the future.");

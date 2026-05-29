@@ -38,7 +38,7 @@ public class CreateTaskRequestValidatorTests
     public void TitleExceedsMaxLength_FailsValidation()
     {
         var request = ValidRequest;
-        request.Title = new string('a', 101);
+        request.Title = new string('a', 201);
         var result = _sut.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.Title);
     }
@@ -47,7 +47,34 @@ public class CreateTaskRequestValidatorTests
     public void TitleAtMaxLength_PassesValidation()
     {
         var request = ValidRequest;
-        request.Title = new string('a', 100);
+        request.Title = new string('a', 200);
+        var result = _sut.TestValidate(request);
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void DescriptionExceedsMaxLength_FailsValidation()
+    {
+        var request = ValidRequest;
+        request.Description = new string('a', 1001);
+        var result = _sut.TestValidate(request);
+        result.ShouldHaveValidationErrorFor(x => x.Description);
+    }
+
+    [Fact]
+    public void DescriptionAtMaxLength_PassesValidation()
+    {
+        var request = ValidRequest;
+        request.Description = new string('a', 1000);
+        var result = _sut.TestValidate(request);
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void NullDescription_PassesValidation()
+    {
+        var request = ValidRequest;
+        request.Description = null;
         var result = _sut.TestValidate(request);
         result.ShouldNotHaveAnyValidationErrors();
     }

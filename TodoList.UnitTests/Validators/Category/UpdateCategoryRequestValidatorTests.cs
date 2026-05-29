@@ -25,7 +25,7 @@ public class UpdateCategoryRequestValidatorTests
     [Fact]
     public void NameExceedsMaxLength_FailsValidation()
     {
-        var request = new UpdateCategoryRequest(new string('a', 101));
+        var request = new UpdateCategoryRequest(new string('a', 51));
         var result = _sut.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.Name);
     }
@@ -33,7 +33,7 @@ public class UpdateCategoryRequestValidatorTests
     [Fact]
     public void NameAtMaxLength_PassesValidation()
     {
-        var request = new UpdateCategoryRequest(new string('a', 100));
+        var request = new UpdateCategoryRequest(new string('a', 50));
         var result = _sut.TestValidate(request);
         result.ShouldNotHaveAnyValidationErrors();
     }
