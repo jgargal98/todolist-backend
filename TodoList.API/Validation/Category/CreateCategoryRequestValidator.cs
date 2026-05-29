@@ -16,6 +16,6 @@ public class CreateCategoryRequestValidator : AbstractValidator<CreateCategoryRe
         // Enforce that the name cannot be null, empty, or just whitespace
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Category name is strictly required.")
-            .MaximumLength(100).WithMessage("Category name must not exceed 100 characters.");
+            .MaximumLength(50).WithMessage("Category name must not exceed 50 characters.");
     }
 }

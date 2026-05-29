@@ -100,6 +100,45 @@ public class UpdateTaskRequestValidatorTests
     }
 
     [Fact]
+    public void EmptySubTaskTitle_FailsValidation()
+    {
+        var request = ValidRequest with
+        {
+            SubTasks = new List<UpdateSubTaskRequest>
+            {
+                new() { Title = "" }
+            }
+        };
+        var result = _sut.TestValidate(request);
+        result.ShouldHaveValidationErrorFor("SubTasks[0].Title");
+    }
+
+    [Fact]
+    public void ValidSubTaskTitle_PassesValidation()
+    {
+        var request = ValidRequest with
+        {
+            SubTasks = new List<UpdateSubTaskRequest>
+            {
+                new() { Title = "Valid subtask" }
+            }
+        };
+        var result = _sut.TestValidate(request);
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void EmptySubTasksList_PassesValidation()
+    {
+        var request = ValidRequest with
+        {
+            SubTasks = new List<UpdateSubTaskRequest>()
+        };
+        var result = _sut.TestValidate(request);
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
     public void PastDueDate_FailsValidation()
     {
         var request = ValidRequest with { DueDate = DateTime.UtcNow.AddDays(-1) };

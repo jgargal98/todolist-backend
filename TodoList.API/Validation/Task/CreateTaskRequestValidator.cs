@@ -14,7 +14,11 @@ public class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>
         // Rule for Title: Cannot be empty, must be trimmed implicitly, max 100 characters
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Task title is strictly required.")
-            .MaximumLength(100).WithMessage("Task title cannot exceed 100 characters.");
+            .MaximumLength(200).WithMessage("Task title cannot exceed 200 characters.");
+
+        // Rule for Description: Max 1000 characters when provided
+        RuleFor(x => x.Description)
+            .MaximumLength(1000).WithMessage("Task description cannot exceed 1000 characters.");
 
         // Rule for Status: Bounded strictly between 1 and 5
         RuleFor(x => x.Status)
