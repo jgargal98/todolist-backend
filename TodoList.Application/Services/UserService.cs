@@ -20,10 +20,7 @@ public class UserService : IUserService
     /// <inheritdoc />
     public async Task<IEnumerable<UserResponseDto>> GetUsersAsync()
     {
-        // 1. Get entities from the Infrastructure layer (Repository)
         var users = await _userRepository.GetAllAsync();
-
-        // 2. Map the entities to DTOs to hide sensitive information
         return _mapper.Map<IEnumerable<UserResponseDto>>(users);
     }
 }

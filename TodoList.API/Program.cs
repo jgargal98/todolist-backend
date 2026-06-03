@@ -11,28 +11,22 @@ using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. SERVICE CONFIGURATION (Dependency Injection Container) ---
-// --- REGISTER LAYERS ---
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<UserProfile>();
 }, AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddControllers();
 
-//Dependency Injection for every service and config
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-//Dependency Injection for FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryRequestValidator>();
 
-/// <summary>
-/// Configure CORS using an environment variable for better security.
-/// </summary>
-var frontendUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:3000"; // Default for local dev
+// Configure CORS using an environment variable for better security.
+var frontendUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:3000";
 
 builder.Services.AddCors(options =>
 {
@@ -45,9 +39,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-/// <summary>
-/// Configure Swagger/OpenAPI for interactive documentation.
-/// </summary>
+// Configure Swagger/OpenAPI for interactive documentation.
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -74,15 +66,8 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// --- 2. MIDDLEWARE PIPELINE (Request Handling) ---
-/// <summary>
-/// Define the request processing pipeline using Middlewares.
-/// </summary>
-
-// Custom middleware to handle exceptionss
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// Enables Swagger UI
 app.UseSwagger();
 app.UseSwaggerUI(c =>
     {
@@ -90,23 +75,13 @@ app.UseSwaggerUI(c =>
         c.EnablePersistAuthorization();
     });
 
-//app.UseHttpsRedirection();
-// Use CORS before Authentication
 app.UseCors("AllowFrontend");
-// Crucial: Identification of the user
 app.UseAuthentication();
-// Crucial: Checking user permissions
 app.UseAuthorization();
 
-// Route requests to Controller actions
 app.MapControllers();
 
-// --- 3. DATABASE CREATION AND MANAGEMENT ---
-/// <summary>
-/// Automatically applies migrations at startup to ensure the database is ready.
-/// </summary>
-/// 
-// Call the initializer (skip in integration tests — setup is handled by the test factory)
+// Apply pending migrations at startup (skipped during integration testing).
 if (!app.Environment.IsEnvironment("IntegrationTesting"))
 {
     await app.Services.InitializeDatabaseAsync();

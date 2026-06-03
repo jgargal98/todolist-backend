@@ -6,7 +6,7 @@ namespace TodoList.API.Controllers;
 /// Controller used for testing the global exception handling middleware.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")] // /api/Exception
+[Route("api/[controller]")]
 public class ExceptionController : ControllerBase
 {
     /// <summary>Throws an exception to verify the middleware catches it correctly.</summary>

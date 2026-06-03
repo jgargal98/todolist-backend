@@ -7,7 +7,7 @@ using TodoList.Application.Interfaces;
 namespace TodoList.API.Controllers;
 
 /// <summary>
-/// Exposes structured secure endpoints to handle user-scoped tag operations.
+/// Handles CRUD operations for user-scoped tags.
 /// </summary>
 [Authorize]
 [ApiController]
@@ -19,14 +19,14 @@ public class TagsController : ControllerBase
     /// <summary>
     /// Initializes a new instance of <see cref="TagsController"/>.
     /// </summary>
-    /// <param name="tagService">The orchestration application workflow contract implementation.</param>
+    /// <param name="tagService">The tag service dependency.</param>
     public TagsController(ITagService tagService)
     {
         _tagService = tagService;
     }
 
     /// <summary>
-    /// Obtains all tags mapped exclusively under the current active identity claim context.
+    /// Retrieves all tags for the authenticated user.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TagResponse>))]
@@ -43,7 +43,7 @@ public class TagsController : ControllerBase
     }
 
     /// <summary>
-    /// Records and instantiates a pristine custom tag resource under the user space.
+    /// Creates a new tag for the authenticated user.
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(TagResponse))]
@@ -67,7 +67,7 @@ public class TagsController : ControllerBase
     }
 
     /// <summary>
-    /// Purges a single tag asset item from persistent storage engines.
+    /// Deletes a tag belonging to the authenticated user.
     /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -21,7 +21,6 @@ public class AuthController(IAuthService authService) : ControllerBase
     {
         try
         {
-            // The service now handles both validation and token generation internally.
             var response = await authService.LoginAsync(request);
 
             if (response is null)
@@ -47,7 +46,6 @@ public class AuthController(IAuthService authService) : ControllerBase
     {
         try
         {
-            // The service registers the user and returns the tokens in a single database roundtrip.
             var response = await authService.RegisterAsync(request);
 
             if (response is null)

@@ -7,7 +7,7 @@ using TodoList.Application.Interfaces;
 namespace TodoList.API.Controllers;
 
 /// <summary>
-/// Exposes structured secure endpoints to handle user-scoped categories operations.
+/// Handles CRUD operations for user-scoped categories.
 /// </summary>
 [Authorize]
 [ApiController]
@@ -19,14 +19,14 @@ public class CategoriesController : ControllerBase
     /// <summary>
     /// Initializes a new instance of <see cref="CategoriesController"/>.
     /// </summary>
-    /// <param name="categoryService">The orchestration application workflow contract implementation.</param>
+    /// <param name="categoryService">The category service dependency.</param>
     public CategoriesController(ICategoryService categoryService)
     {
         _categoryService = categoryService;
     }
 
     /// <summary>
-    /// Obtains all categories mapped exclusively under the current active identity claim context.
+    /// Retrieves all categories for the authenticated user.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CategoryResponse>))]
@@ -43,7 +43,7 @@ public class CategoriesController : ControllerBase
     }
 
     /// <summary>
-    /// Records and instantiates a pristine custom category resource under the user space.
+    /// Creates a new category for the authenticated user.
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CategoryResponse))]
@@ -61,7 +61,6 @@ public class CategoriesController : ControllerBase
 
         if (response == null)
         {
-            // Returns a Bad Request if user validation routines fail
             return BadRequest(new { message = "Invalid user identity context state execution data." });
         }
 
@@ -69,7 +68,7 @@ public class CategoriesController : ControllerBase
     }
 
     /// <summary>
-    /// Modifies structural properties of a localized user category asset item.
+    /// Updates an existing category.
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -94,7 +93,7 @@ public class CategoriesController : ControllerBase
     }
 
     /// <summary>
-    /// Purges a single category asset item from persistent storage engines.
+    /// Deletes a category.
     /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

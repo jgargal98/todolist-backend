@@ -29,7 +29,6 @@ public class TagRepository(AppDbContext context) : ITagRepository
     /// <inheritdoc />
     public async Task<IEnumerable<Tag>> GetTagsByIdsAsync(List<Guid> tagIds, string userId)
     {
-        // The LINQ Contains operator evaluates efficiently as a SQL 'WHERE Id IN (...)' clause combined with multi-tenancy filters
         return await context.Tags
             .Where(t => tagIds.Contains(t.Id) && t.UserId == userId)
             .ToListAsync();
@@ -38,33 +37,22 @@ public class TagRepository(AppDbContext context) : ITagRepository
     /// <inheritdoc />
     public async Task<bool> AddAsync(Tag tag)
     {
-        // 1. Append the tag entity to the context tracking state
         await context.Tags.AddAsync(tag);
-
-        // 2. Persist to SQL Server. If it fails or throws, your Controller's try-catch handles it.
         await context.SaveChangesAsync();
-
-        // 3. Return true to signal that the infrastructure execution completed successfully
         return true;
     }
 
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(Guid id)
     {
-        // 1. Locate the tag within the database context tracking memory or storage
         var tag = await context.Tags.FindAsync(id);
         if (tag is null)
         {
             return false;
         }
 
-        // 2. Remove the entry from the database context
         context.Tags.Remove(tag);
-
-        // 3. Persist to SQL Server. If it fails or throws, your Controller's try-catch handles it.
         await context.SaveChangesAsync();
-
-        // 4. Return true to signal that the infrastructure execution completed successfully
         return true;
     }
 }
