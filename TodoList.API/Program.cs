@@ -106,7 +106,10 @@ app.MapControllers();
 /// Automatically applies migrations at startup to ensure the database is ready.
 /// </summary>
 /// 
-// Call the initializer
-await app.Services.InitializeDatabaseAsync();
+// Call the initializer (skip in integration tests — setup is handled by the test factory)
+if (!app.Environment.IsEnvironment("IntegrationTesting"))
+{
+    await app.Services.InitializeDatabaseAsync();
+}
 
 app.Run();
