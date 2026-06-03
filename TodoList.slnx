@@ -3,4 +3,5 @@
   <Project Path="TodoList.Application/TodoList.Application.csproj" />
   <Project Path="TodoList.Domain/TodoList.Domain.csproj" />
   <Project Path="TodoList.Infrastructure/TodoList.Infrastructure.csproj" />
+  <Project Path="TodoList.IntegrationTests/TodoList.IntegrationTests.csproj" />
 </Solution>
