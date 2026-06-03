@@ -53,8 +53,6 @@ public class UserRepository(UserManager<User> userManager) : IUserRepository
     /// <inheritdoc />
     public async Task<User?> GetByEmailAsync(string email)
     {
-        // We use the built-in FindByEmailAsync method from ASP.NET Core Identity's UserManager.
-        // This method is optimized and handles the underlying EF Core query.
         return await userManager.FindByEmailAsync(email);
     }
 }

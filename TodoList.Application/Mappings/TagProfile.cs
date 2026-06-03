@@ -8,12 +8,10 @@ namespace TodoList.Application.Mappings;
 public class TagProfile : Profile
 {
     /// <summary>
-    /// Initializes the mapping configurations for Task entities and their respective DTOs.
+    /// Initializes the mapping configuration for Tag entities to TagResponse DTOs.
     /// </summary>
     public TagProfile()
     {
-        // Primary map configuration for TaskItem to TaskResponse
         CreateMap<Tag, TagResponse>();
-
     }
 }

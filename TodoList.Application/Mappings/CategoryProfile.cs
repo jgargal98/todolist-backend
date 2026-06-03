@@ -8,11 +8,10 @@ namespace TodoList.Application.Mappings;
 public class CategoryProfile : Profile
 {
     /// <summary>
-    /// Initializes the mapping configurations for Task entities and their respective DTOs.
+    /// Initializes the mapping configuration for Category entities to CategoryResponse DTOs.
     /// </summary>
     public CategoryProfile()
     {
-        // Primary map configuration for TaskItem to TaskResponse
         CreateMap<Category, CategoryResponse>();
     }
 }

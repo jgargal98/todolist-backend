@@ -7,7 +7,7 @@ namespace TodoList.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Produces("application/json")] // Explicitly tells Swagger what to expect
+[Produces("application/json")]
 public class HelloWorldController : ControllerBase
 {
     /// <summary>

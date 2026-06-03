@@ -20,7 +20,6 @@ public class Category
 
     /// <summary>
     /// Navigation property: List of tasks under this category.
-    /// This fixes the "Category does not contain a definition for Tasks" error.
     /// </summary>
     public virtual ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
 }

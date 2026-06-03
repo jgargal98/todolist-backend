@@ -14,7 +14,6 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
     /// <inheritdoc />
     public async Task<IEnumerable<Category>> GetByUserIdAsync(string userId)
     {
-        // Querying records using strict multi-tenant filtering conventions
         return await context.Categories
             .Where(c => c.UserId == userId)
             .ToListAsync();
@@ -23,7 +22,6 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
     /// <inheritdoc />
     public async Task<Category?> GetByIdAndUserIdAsync(Guid id, string userId)
     {
-        // Enforcing security containment parameters at database access level execution
         return await context.Categories
             .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
     }
@@ -34,13 +32,11 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
         try
         {
             await context.Categories.AddAsync(category);
-            // Directly committing changes avoiding primitive state comparison shortcuts
             await context.SaveChangesAsync();
             return true;
         }
         catch
         {
-            // Bubble down state failures allowing higher application layers to coordinate errors safely
             return false;
         }
     }
@@ -51,7 +47,6 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
         try
         {
             context.Categories.Update(category);
-            // Synchronize state snapshot modifications to SQL Server database architecture
             await context.SaveChangesAsync();
             return true;
         }
@@ -67,7 +62,6 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
         try
         {
             context.Categories.Remove(category);
-            // Execute physical deletion routine tracking references
             await context.SaveChangesAsync();
             return true;
         }
