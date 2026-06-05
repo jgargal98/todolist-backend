@@ -15,12 +15,11 @@ The project is fully functional with the following capabilities:
 - [x] Global exception handling middleware
 - [x] Swagger/OpenAPI documentation with JWT bearer auth
 - [x] AutoMapper for entity-to-DTO mapping
-- [x] EF Core migrations with auto-seeded admin user
+- [x] EF Core auto-migrations at startup via `InitializeDatabaseAsync`
 - [x] CORS policy configured for Angular frontend
 - [x] Asymmetric RSA key pair (RS256) for JWT signing
-- [x] HTTP integration tests (REST Client format)
-
-**Note:** EF Core migrations have not been generated yet — the `AppDbContextModelSnapshot.cs` file is empty. Run `dotnet ef migrations add InitialCreate` before the first launch (or let `DbInitializer` handle it at startup).
+- [x] Unit tests (xUnit + Moq + FluentValidation)
+- [x] Integration tests (xUnit + WebApplicationFactory + InMemory DB)
 
 ## Tech Stack
 
@@ -34,35 +33,40 @@ The project is fully functional with the following capabilities:
 | FluentValidation      | 12.1.1  |
 | Swashbuckle (Swagger) | 10.1.7  |
 | SQL Server (LocalDB)  | LocalDB |
+| xUnit                 | 2.9.3   |
+| Moq                   | 4.20.72 |
+| FluentAssertions      | 7.2.0   |
 
 ## Architecture
 
 The solution follows **Clean Architecture** principles with four projects:
 
 ```
-TodoList.Domain      → Entities, repository interfaces (no dependencies)
-TodoList.Application → DTOs, services, mappings, application interfaces
+TodoList.Domain         → Entities (no dependencies)
+TodoList.Application    → DTOs, services, mappings, interfaces
 TodoList.Infrastructure → EF Core, repositories, JWT provider, DB seeding
-TodoList.API         → Controllers, middleware, validation, startup
+TodoList.API            → Controllers, middleware, validation, startup
 ```
 
 Dependency flow: `API → Application → Domain` and `API → Infrastructure → Application + Domain`.
 
-### File Structure and Clean Architecture
+### File Structure
 
-The following structure demonstrates the separation of concerns. The Domain layer remains independent, while Infrastructure handles data persistence and Application manages business logic and DTO mapping.
-
-```text
+```
 todolist/
 ├── backend/
-│   ├── TodoList.API/           # Entry point, Controllers, and Program.cs
-│   ├── TodoList.Application/   # DTOs, Interfaces, Mappings, and Services
-│   ├── TodoList.Domain/        # Entities and Repository Interfaces
-│   └── TodoList.Infrastructure/# Data Context, Repositories, and Migrations
+│   ├── TodoList.API/               # Entry point, Controllers, Program.cs
+│   │   ├── Controllers/            # Auth, Tasks, Categories, Tags, Users
+│   │   ├── Middlewares/            # GlobalExceptionMiddleware
+│   │   └── Validation/            # FluentValidation validators
+│   ├── TodoList.Application/       # DTOs, Interfaces, Services, Mappings
+│   ├── TodoList.Domain/            # Entities (User, TaskItem, Category, Tag)
+│   ├── TodoList.Infrastructure/    # Data context, Repositories, JWT, seeding
+│   ├── TodoList.UnitTests/         # Unit tests (validators, services, mappings)
+│   ├── TodoList.IntegrationTests/  # Integration tests (full HTTP pipeline)
+│   └── TodoList.API.postman_collection.json  # Postman collection for demo
 │
-...
-│
-└── frontend/                   # Angular front end
+└── frontend/                       # Angular front end
 ```
 
 ## Data Model
@@ -89,8 +93,6 @@ TaskItem (M) >──< Tag (N)  [via TaskTags]
 
 ### Data Model (Entity Relationship Diagram)
 
-The database schema is designed to handle user authentication and relational note management efficiently. This diagram illustrates the core entities and their relationships within the Azure SQL instance.
-
 ![Entity Relationship Diagram](ToDo-Schema.png)
 
 ## Getting Started
@@ -103,11 +105,7 @@ The database schema is designed to handle user authentication and relational not
 ### Setup
 
 1. **Clone the repository** and navigate to `backend/`
-2. **Generate EF Core migrations** (first time only):
-    ```bash
-    dotnet ef migrations add InitialCreate
-    ```
-3. **Run the API**:
+2. **Run the API**:
 
     ```bash
     dotnet run --project TodoList.API
@@ -187,13 +185,87 @@ All task endpoints require a valid JWT (`Authorization: Bearer <token>`).
 
 ## Testing
 
-HTTP integration tests are located in `TodoList.API/Tests/`. They are formatted as `.http` files compatible with Visual Studio's REST Client or VS Code's REST Client extension:
+The solution contains two test projects: **Unit Tests** and **Integration Tests**.
 
-- `auth-tests.http`
-- `task-tests.http`
-- `category-tests.http`
-- `tag-tests.http`
-- `integration-test.http` (full CRUD flow)
+### Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run only unit tests
+dotnet test TodoList.UnitTests
+
+# Run only integration tests
+dotnet test TodoList.IntegrationTests
+```
+
+### Unit Tests (`TodoList.UnitTests`)
+
+Uses **xUnit** + **Moq** + **FluentValidation TestHelper**. Located at `TodoList.UnitTests/`.
+
+| Category       | File                                                          | What it tests                                   |
+| -------------- | ------------------------------------------------------------- | ----------------------------------------------- |
+| Validators     | `Validators/Auth/LoginRequestValidatorTests.cs`               | Login email/password validation rules           |
+| Validators     | `Validators/Auth/RegisterRequestValidatorTests.cs`            | Register email, password, confirm rules         |
+| Validators     | `Validators/Auth/RefreshRequestValidatorTests.cs`             | Refresh token presence validation               |
+| Validators     | `Validators/Category/CreateCategoryRequestValidatorTests.cs`  | Category name max length and required rules     |
+| Validators     | `Validators/Category/UpdateCategoryRequestValidatorTests.cs`  | Category name max length and required rules     |
+| Validators     | `Validators/Tag/CreateTagRequestValidatorTests.cs`            | Tag name max length and required rules          |
+| Validators     | `Validators/Task/CreateTaskRequestValidatorTests.cs`          | Task title, description, status, due date, subs |
+| Validators     | `Validators/Task/UpdateTaskRequestValidatorTests.cs`          | Task title, description, status, due date, subs |
+| Services       | `Services/AuthServiceTests.cs`                                | Login, register, refresh token logic            |
+| Services       | `Services/CategoryServiceTests.cs`                            | Category CRUD with user-scoping                 |
+| Services       | `Services/TagServiceTests.cs`                                 | Tag CRUD with user-scoping                      |
+| Services       | `Services/TaskServiceTests.cs`                                | Task CRUD with subtasks, tags, ownership        |
+| Services       | `Services/UserServiceTests.cs`                                | User listing                                    |
+| Mappings       | `Mappings/MappingProfileTests.cs`                             | AutoMapper configuration validity and mapping   |
+
+### Integration Tests (`TodoList.IntegrationTests`)
+
+Uses **xUnit** + **WebApplicationFactory** + **InMemory Database** + **TestAuthHandler**. Located at `TodoList.IntegrationTests/`.
+
+The `IntegrationTestWebApplicationFactory`:
+- Replaces SQL Server with an **EF Core InMemory** database
+- Replaces JWT Bearer auth with `TestAuthHandler` (auto-authenticated requests)
+- Generates ephemeral RSA keys for the real JwtProvider
+- Seeds a test user via `UserManager`
+
+| File                                | What it tests                                      |
+| ----------------------------------- | -------------------------------------------------- |
+| `AuthIntegrationTests.cs`           | Register, login, refresh, duplicate email, bad auth|
+| `TasksIntegrationTests.cs`          | Create, get all, update, delete tasks              |
+| `CategoriesIntegrationTests.cs`     | Create, get all, update, delete categories         |
+| `TagsIntegrationTests.cs`           | Create, get all, delete tags                       |
+| `UsersIntegrationTests.cs`          | List all users                                     |
+| `HelloWorldIntegrationTests.cs`     | Public health check endpoint                       |
+| `ExceptionIntegrationTests.cs`      | Global exception handling middleware               |
+
+### Postman Collection
+
+For manual API testing and demos, a **Postman collection** (v2.1.0) is available at:
+
+```
+TodoList.API.postman_collection.json
+```
+
+Import it into Postman (`File → Import`) and follow this flow:
+
+1. Open the **Auth > Login** request body and set valid credentials
+2. **Send Login** — the test script auto-saves the JWT to `{{jwt_token}}`
+3. All protected endpoints (Tasks, Categories, Tags, Users) inherit the token automatically via folder-level Bearer auth
+4. Use **Create Task / Category / Tag** to generate resources; their IDs are captured automatically for subsequent update/delete requests
+
+Collection variables:
+
+| Variable         | Default                  | Description                     |
+| ---------------- | ------------------------ | ------------------------------- |
+| `base_url`       | `http://localhost:5124`   | API base URL                    |
+| `jwt_token`      | *(empty)*                | Auto-populated after login      |
+| `refresh_token`  | *(empty)*                | Auto-populated after login      |
+| `task_id`        | *(empty)*                | Auto-populated after creation   |
+| `category_id`    | *(empty)*                | Auto-populated after creation   |
+| `tag_id`         | *(empty)*                | Auto-populated after creation   |
 
 ## Configuration
 
@@ -202,4 +274,4 @@ Key settings in `appsettings.json`:
 - **ConnectionStrings:DefaultConnection** — SQL Server connection string (LocalDB by default)
 - **Jwt** — RSA private/public keys (PEM), issuer, and audience
 - **IdentityOptions** — Password policy and user settings
-- **CORS** — Frontend URL allowed (default `http://localhost:3000`)
+- **CORS** — Frontend URL allowed (default `http://localhost:3000`, overridable via `FrontendUrl` env var)
