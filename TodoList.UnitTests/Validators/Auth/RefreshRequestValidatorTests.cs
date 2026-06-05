@@ -29,4 +29,13 @@ public class RefreshRequestValidatorTests
         var result = _sut.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.RefreshToken);
     }
+
+    [Fact]
+    public void BothTokensEmpty_FailsValidation()
+    {
+        var request = new RefreshRequest("", "");
+        var result = _sut.TestValidate(request);
+        result.ShouldHaveValidationErrorFor(x => x.AccessToken);
+        result.ShouldHaveValidationErrorFor(x => x.RefreshToken);
+    }
 }

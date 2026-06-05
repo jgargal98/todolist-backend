@@ -161,4 +161,43 @@ public class UpdateTaskRequestValidatorTests
         var result = _sut.TestValidate(request);
         result.ShouldNotHaveAnyValidationErrors();
     }
+
+    [Fact]
+    public void WhitespaceTitle_FailsValidation()
+    {
+        var result = _sut.TestValidate(ValidRequest with { Title = "   " });
+        result.ShouldHaveValidationErrorFor(x => x.Title);
+    }
+
+    [Fact]
+    public void MultipleSubTasks_WithOneInvalid_FailsOnInvalidOnly()
+    {
+        var request = ValidRequest with
+        {
+            SubTasks = new List<UpdateSubTaskRequest>
+            {
+                new() { Title = "Valid" },
+                new() { Title = "" },
+                new() { Title = "Also valid" }
+            }
+        };
+        var result = _sut.TestValidate(request);
+        result.ShouldHaveValidationErrorFor("SubTasks[1].Title");
+        result.ShouldNotHaveValidationErrorFor("SubTasks[0].Title");
+        result.ShouldNotHaveValidationErrorFor("SubTasks[2].Title");
+    }
+
+    [Fact]
+    public void CategoryId_Null_PassesValidation()
+    {
+        var result = _sut.TestValidate(ValidRequest with { CategoryId = null });
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void CategoryId_ValidGuid_PassesValidation()
+    {
+        var result = _sut.TestValidate(ValidRequest with { CategoryId = Guid.NewGuid() });
+        result.ShouldNotHaveAnyValidationErrors();
+    }
 }

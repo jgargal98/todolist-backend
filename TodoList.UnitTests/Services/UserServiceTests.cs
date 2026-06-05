@@ -61,4 +61,30 @@ public class UserServiceTests
 
         Assert.Empty(result);
     }
+
+    [Fact]
+    public async Task GetUsersAsync_WithSingleUser_ReturnsSingleUser()
+    {
+        var users = new List<User>
+        {
+            new() { Id = Guid.NewGuid().ToString(), Email = "single@test.com", UserName = "single" }
+        };
+
+        _userRepoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(users);
+
+        var result = await _sut.GetUsersAsync();
+
+        Assert.Single(result);
+        Assert.Equal("single@test.com", result.First().Email);
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WhenRepositoryThrows_PropagatesException()
+    {
+        _userRepoMock.Setup(r => r.GetAllAsync())
+            .Throws(new InvalidOperationException("DB error"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.GetUsersAsync());
+    }
 }

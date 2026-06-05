@@ -235,4 +235,92 @@ public class AuthServiceTests
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.RegisterAsync(ValidRegister));
     }
+
+    [Fact]
+    public async Task RefreshTokenAsync_WithPrincipalHavingNoNameClaim_ReturnsNull()
+    {
+        var principal = new ClaimsPrincipal(new ClaimsIdentity());
+
+        _tokenProviderMock.Setup(t => t.GetPrincipalFromExpiredToken("token"))
+            .Returns(principal);
+
+        var result = await _sut.RefreshTokenAsync(ValidRefresh("token", "refresh"));
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task RefreshTokenAsync_WhenPrincipalIdentityIsNull_ReturnsNull()
+    {
+        var principal = new ClaimsPrincipal();
+
+        _tokenProviderMock.Setup(t => t.GetPrincipalFromExpiredToken("token"))
+            .Returns(principal);
+
+        var result = await _sut.RefreshTokenAsync(ValidRefresh("token", "refresh"));
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task LoginAsync_WhenUpdateAsyncThrows_PropagatesException()
+    {
+        var user = CreateUser();
+        _userRepoMock.Setup(r => r.ValidateCredentialsAsync(user.Email!, "Password123!"))
+            .ReturnsAsync(user);
+        _tokenProviderMock.Setup(t => t.Generate(user)).Returns("jwt");
+        _tokenProviderMock.Setup(t => t.GenerateRefreshToken()).Returns("refresh");
+        _userRepoMock.Setup(r => r.UpdateAsync(user)).Throws(new InvalidOperationException("Connection lost"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _sut.LoginAsync(new LoginRequest(user.Email!, "Password123!")));
+    }
+
+    [Fact]
+    public async Task LoginAsync_WithNonExistentEmailOnValidate_ReturnsNull()
+    {
+        _userRepoMock.Setup(r => r.ValidateCredentialsAsync("ghost@example.com", "Password123!"))
+            .ReturnsAsync((User?)null);
+
+        var result = await _sut.LoginAsync(new LoginRequest("ghost@example.com", "Password123!"));
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task RegisterAsync_WhenUpdateFailsAfterCreation_ReturnsNull()
+    {
+        _userRepoMock.Setup(r => r.GetByEmailAsync("new@example.com"))
+            .ReturnsAsync((User?)null);
+        _userRepoMock.Setup(r => r.CreateAsync(It.IsAny<User>(), "Password123!"))
+            .ReturnsAsync(true);
+        _tokenProviderMock.Setup(t => t.Generate(It.IsAny<User>())).Returns("jwt");
+        _tokenProviderMock.Setup(t => t.GenerateRefreshToken()).Returns("refresh");
+        _userRepoMock.Setup(r => r.UpdateAsync(It.IsAny<User>())).ReturnsAsync(false);
+
+        var result = await _sut.RegisterAsync(ValidRegister);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task RefreshTokenAsync_WithExpiredTokenAndMatchingRefresh_ReturnsNull()
+    {
+        var user = CreateUser();
+        user.RefreshToken = "valid-refresh";
+        user.RefreshTokenExpiryTime = DateTime.UtcNow;
+
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.Name, user.Email!)
+        }));
+
+        _tokenProviderMock.Setup(t => t.GetPrincipalFromExpiredToken("expired-token"))
+            .Returns(principal);
+        _userRepoMock.Setup(r => r.GetByEmailAsync(user.Email!)).ReturnsAsync(user);
+
+        var result = await _sut.RefreshTokenAsync(ValidRefresh("expired-token", "valid-refresh"));
+
+        Assert.Null(result);
+    }
 }

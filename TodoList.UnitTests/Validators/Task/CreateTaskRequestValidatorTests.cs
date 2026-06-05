@@ -153,4 +153,47 @@ public class CreateTaskRequestValidatorTests
         var result = _sut.TestValidate(request);
         result.ShouldNotHaveAnyValidationErrors();
     }
+
+    [Fact]
+    public void WhitespaceTitle_FailsValidation()
+    {
+        var request = ValidRequest;
+        request.Title = "   ";
+        var result = _sut.TestValidate(request);
+        result.ShouldHaveValidationErrorFor(x => x.Title);
+    }
+
+    [Fact]
+    public void MultipleSubTasks_WithOneInvalid_FailsOnInvalidOnly()
+    {
+        var request = ValidRequest;
+        request.SubTasks = new List<CreateSubTaskRequest>
+        {
+            new() { Title = "Valid subtask" },
+            new() { Title = "" },
+            new() { Title = "Another valid" }
+        };
+        var result = _sut.TestValidate(request);
+        result.ShouldHaveValidationErrorFor("SubTasks[1].Title");
+        result.ShouldNotHaveValidationErrorFor("SubTasks[0].Title");
+        result.ShouldNotHaveValidationErrorFor("SubTasks[2].Title");
+    }
+
+    [Fact]
+    public void CategoryId_Null_PassesValidation()
+    {
+        var request = ValidRequest;
+        request.CategoryId = null;
+        var result = _sut.TestValidate(request);
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void CategoryId_ValidGuid_PassesValidation()
+    {
+        var request = ValidRequest;
+        request.CategoryId = Guid.NewGuid();
+        var result = _sut.TestValidate(request);
+        result.ShouldNotHaveAnyValidationErrors();
+    }
 }

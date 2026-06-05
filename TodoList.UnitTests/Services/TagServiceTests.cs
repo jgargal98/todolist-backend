@@ -198,4 +198,52 @@ public class TagServiceTests
 
         Assert.False(result);
     }
+
+    [Fact]
+    public async Task CreateTagAsync_TrimsWhitespaceName()
+    {
+        _userRepoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(UsersWith(UserId));
+        _tagRepoMock.Setup(r => r.AddAsync(It.IsAny<Tag>()))
+            .ReturnsAsync(true);
+
+        Tag? captured = null;
+        _tagRepoMock.Setup(r => r.AddAsync(It.IsAny<Tag>()))
+            .Callback<Tag>(t => captured = t)
+            .ReturnsAsync(true);
+
+        var result = await _sut.CreateTagAsync(UserId, new CreateTagRequest { Name = "  Important  " });
+
+        Assert.NotNull(result);
+        Assert.Equal("Important", captured!.Name);
+    }
+
+    [Fact]
+    public async Task CreateTagAsync_WhenRepositoryThrows_PropagatesException()
+    {
+        _userRepoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(UsersWith(UserId));
+        _tagRepoMock.Setup(r => r.AddAsync(It.IsAny<Tag>()))
+            .Throws(new InvalidOperationException("DB insert failed"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _sut.CreateTagAsync(UserId, new CreateTagRequest { Name = "Tag" }));
+    }
+
+    [Fact]
+    public async Task DeleteTagAsync_WhenRepositoryThrows_PropagatesException()
+    {
+        var tagId = Guid.NewGuid();
+        var tag = new Tag { Id = tagId, Name = "Tag", UserId = UserId };
+
+        _userRepoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(UsersWith(UserId));
+        _tagRepoMock.Setup(r => r.GetByIdAndUserIdAsync(tagId, UserId))
+            .ReturnsAsync(tag);
+        _tagRepoMock.Setup(r => r.DeleteAsync(tagId))
+            .Throws(new InvalidOperationException("DB error"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _sut.DeleteTagAsync(tagId, UserId));
+    }
 }

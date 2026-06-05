@@ -37,4 +37,20 @@ public class LoginRequestValidatorTests
         var result = _sut.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.Password);
     }
+
+    [Fact]
+    public void WhitespaceEmail_FailsValidation()
+    {
+        var request = new LoginRequest("   ", "Password123!");
+        var result = _sut.TestValidate(request);
+        result.ShouldHaveValidationErrorFor(x => x.Email);
+    }
+
+    [Fact]
+    public void WhitespacePassword_FailsValidation()
+    {
+        var request = new LoginRequest("user@example.com", "   ");
+        var result = _sut.TestValidate(request);
+        result.ShouldHaveValidationErrorFor(x => x.Password);
+    }
 }
