@@ -14,9 +14,4 @@ public class TagResponse
     /// Gets or sets the descriptive name of the tag.
     /// </summary>
     public string Name { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the user identity string context owner of this tag.
-    /// </summary>
-    public string UserId { get; set; } = string.Empty;
 }
