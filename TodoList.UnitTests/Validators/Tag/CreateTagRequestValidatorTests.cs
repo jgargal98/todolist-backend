@@ -37,4 +37,22 @@ public class CreateTagRequestValidatorTests
         var result = _sut.TestValidate(request);
         result.ShouldNotHaveAnyValidationErrors();
     }
+
+    [Fact]
+    public void SingleCharacterName_PassesValidation()
+    {
+        var request = new CreateTagRequest { Name = "A" };
+        var result = _sut.TestValidate(request);
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Theory]
+    [InlineData("  Tag  ")]
+    [InlineData("Tag with spaces")]
+    public void NameWithSpaces_PassesValidation(string name)
+    {
+        var request = new CreateTagRequest { Name = name };
+        var result = _sut.TestValidate(request);
+        result.ShouldNotHaveAnyValidationErrors();
+    }
 }

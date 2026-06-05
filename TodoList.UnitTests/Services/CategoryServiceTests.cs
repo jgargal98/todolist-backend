@@ -262,4 +262,88 @@ public class CategoryServiceTests
             _sut.DeleteCategoryAsync(catId, UserId));
         Assert.Contains("Database error", ex.Message);
     }
+
+    [Fact]
+    public async Task CreateCategoryAsync_TrimsWhitespaceName()
+    {
+        _userRepoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(UsersWith(UserId));
+        _catRepoMock.Setup(r => r.AddAsync(It.IsAny<Category>()))
+            .ReturnsAsync(true);
+
+        Category? captured = null;
+        _catRepoMock.Setup(r => r.AddAsync(It.IsAny<Category>()))
+            .Callback<Category>(c => captured = c)
+            .ReturnsAsync(true);
+
+        var result = await _sut.CreateCategoryAsync(UserId, new CreateCategoryRequest("  Work  "));
+
+        Assert.NotNull(result);
+        Assert.Equal("Work", captured!.Name);
+    }
+
+    [Fact]
+    public async Task CreateCategoryAsync_WhenRepositoryThrows_PropagatesException()
+    {
+        _userRepoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(UsersWith(UserId));
+        _catRepoMock.Setup(r => r.AddAsync(It.IsAny<Category>()))
+            .Throws(new InvalidOperationException("DB insert failed"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _sut.CreateCategoryAsync(UserId, new CreateCategoryRequest("Name")));
+    }
+
+    [Fact]
+    public async Task UpdateCategoryAsync_WhenNameIsOnlyWhitespace_Trims()
+    {
+        var catId = Guid.NewGuid();
+        var category = new Category { Id = catId, Name = "Old", UserId = UserId };
+
+        _userRepoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(UsersWith(UserId));
+        _catRepoMock.Setup(r => r.GetByIdAndUserIdAsync(catId, UserId))
+            .ReturnsAsync(category);
+        _catRepoMock.Setup(r => r.UpdateAsync(It.IsAny<Category>()))
+            .ReturnsAsync(true);
+
+        var result = await _sut.UpdateCategoryAsync(catId, UserId, new UpdateCategoryRequest("  "));
+
+        Assert.True(result);
+        Assert.Equal("", category.Name);
+    }
+
+    [Fact]
+    public async Task UpdateCategoryAsync_WhenRepositoryThrows_PropagatesException()
+    {
+        var catId = Guid.NewGuid();
+        var category = new Category { Id = catId, Name = "Old", UserId = UserId };
+
+        _userRepoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(UsersWith(UserId));
+        _catRepoMock.Setup(r => r.GetByIdAndUserIdAsync(catId, UserId))
+            .ReturnsAsync(category);
+        _catRepoMock.Setup(r => r.UpdateAsync(It.IsAny<Category>()))
+            .Throws(new InvalidOperationException("DB error"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _sut.UpdateCategoryAsync(catId, UserId, new UpdateCategoryRequest("New")));
+    }
+
+    [Fact]
+    public async Task DeleteCategoryAsync_WhenRepositoryThrows_PropagatesException()
+    {
+        var catId = Guid.NewGuid();
+        var category = new Category { Id = catId, Name = "Category", UserId = UserId };
+
+        _userRepoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(UsersWith(UserId));
+        _catRepoMock.Setup(r => r.GetByIdAndUserIdAsync(catId, UserId))
+            .ReturnsAsync(category);
+        _catRepoMock.Setup(r => r.DeleteAsync(It.IsAny<Category>()))
+            .Throws(new InvalidOperationException("DB error"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _sut.DeleteCategoryAsync(catId, UserId));
+    }
 }

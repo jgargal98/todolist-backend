@@ -203,4 +203,68 @@ public class MappingProfileTests
 
         Assert.Null(dto.Description);
     }
+
+    [Fact]
+    public void CategoryWithSpecialCharacters_MapsCorrectly()
+    {
+        var mapper = CreateMapper(cfg => cfg.AddProfile<CategoryProfile>());
+
+        var category = new Category
+        {
+            Id = Guid.NewGuid(),
+            Name = "Work & Home / Projects (2024)"
+        };
+
+        var dto = mapper.Map<CategoryResponse>(category);
+
+        Assert.Equal("Work & Home / Projects (2024)", dto.Name);
+    }
+
+    [Fact]
+    public void TagWithEmptyUserId_MapsCorrectly()
+    {
+        var mapper = CreateMapper(cfg => cfg.AddProfile<TagProfile>());
+
+        var tag = new Tag
+        {
+            Id = Guid.NewGuid(),
+            Name = "System",
+            UserId = ""
+        };
+
+        var dto = mapper.Map<TagResponse>(tag);
+
+        Assert.Equal(tag.Id, dto.Id);
+        Assert.Equal("System", dto.Name);
+        Assert.Equal("", dto.UserId);
+    }
+
+    [Fact]
+    public void TaskItem_WithAllNullOptionals_MapsCorrectly()
+    {
+        var mapper = CreateMapper(cfg => cfg.AddProfile<TaskProfile>());
+
+        var task = new TaskItem
+        {
+            Id = Guid.NewGuid(),
+            Title = "Minimal",
+            Description = null,
+            DueDate = null,
+            Status = 1,
+            CategoryId = null,
+            SubTasks = new List<SubTask>(),
+            Tags = new List<Tag>()
+        };
+
+        var dto = mapper.Map<TaskResponse>(task);
+
+        Assert.Equal(task.Id, dto.Id);
+        Assert.Equal("Minimal", dto.Title);
+        Assert.Null(dto.Description);
+        Assert.Null(dto.DueDate);
+        Assert.Equal(1, dto.Status);
+        Assert.Null(dto.CategoryId);
+        Assert.Empty(dto.SubTasks);
+        Assert.Empty(dto.Tags);
+    }
 }
