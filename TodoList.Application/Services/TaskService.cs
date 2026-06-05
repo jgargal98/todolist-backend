@@ -130,18 +130,19 @@ public sealed class TaskService(
     /// <param name="userId">The owner identifier for cross-tenant validation.</param>
     /// <param name="tagIds">The collection of tag identifiers to associate.</param>
     /// <returns><c>true</c> if the synchronization succeeds or is skipped; otherwise, <c>false</c>.</returns>
-    private async Task<bool> SyncTaskTagsAsync(TaskItem task, string userId, List<Guid> tagIds)
+    private async Task<bool> SyncTaskTagsAsync(TaskItem task, string userId, IEnumerable<Guid>? tagIds)
     {
         task.Tags.Clear();
-
-        if (tagIds is null || tagIds.Count == 0)
+        if (tagIds is null || !tagIds.Any())
         {
             return true;
         }
 
-        var validTags = await tagRepository.GetTagsByIdsAsync(tagIds, userId);
+        var tagIdsList = tagIds.Distinct().ToList();
 
-        var requestedTagIds = tagIds.Distinct().ToHashSet();
+        var validTags = await tagRepository.GetTagsByIdsAsync(tagIdsList, userId);
+
+        var requestedTagIds = tagIdsList.ToHashSet();
         var returnedTagIds = validTags.Select(t => t.Id).ToHashSet();
         if (!requestedTagIds.SetEquals(returnedTagIds))
         {

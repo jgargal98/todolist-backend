@@ -10,7 +10,7 @@ public record UpdateTaskRequest(
     int Status,
     Guid? CategoryId,
     List<UpdateSubTaskRequest> SubTasks,
-    List<Guid> TagIds
+    List<Guid>? TagIds
 );
 
 /// <summary>

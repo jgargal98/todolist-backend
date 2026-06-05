@@ -27,7 +27,7 @@ public class TagRepository(AppDbContext context) : ITagRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<Tag>> GetTagsByIdsAsync(List<Guid> tagIds, string userId)
+    public async Task<IEnumerable<Tag>> GetTagsByIdsAsync(IEnumerable<Guid> tagIds, string userId)
     {
         return await context.Tags
             .Where(t => tagIds.Contains(t.Id) && t.UserId == userId)
