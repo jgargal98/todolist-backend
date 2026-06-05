@@ -25,7 +25,7 @@ public class TaskServiceTests
                 DueDate = t.DueDate,
                 CategoryId = t.CategoryId,
                 SubTasks = t.SubTasks.Select(st => new SubTaskResponse { Title = st.Title, IsDone = st.IsDone }).ToList(),
-                Tags = t.Tags.Select(tag => new TagResponse { Id = tag.Id, Name = tag.Name, UserId = tag.UserId }).ToList()
+                Tags = t.Tags.Select(tag => new TagResponse { Id = tag.Id, Name = tag.Name }).ToList()
             });
 
         _mapperMock.Setup(m => m.Map<IEnumerable<TaskResponse>>(It.IsAny<IEnumerable<TaskItem>>()))
@@ -38,7 +38,7 @@ public class TaskServiceTests
                 DueDate = t.DueDate,
                 CategoryId = t.CategoryId,
                 SubTasks = t.SubTasks.Select(st => new SubTaskResponse { Title = st.Title, IsDone = st.IsDone }).ToList(),
-                Tags = t.Tags.Select(tag => new TagResponse { Id = tag.Id, Name = tag.Name, UserId = tag.UserId }).ToList()
+                Tags = t.Tags.Select(tag => new TagResponse { Id = tag.Id, Name = tag.Name }).ToList()
             }).ToList() ?? new List<TaskResponse>());
 
         _sut = new TaskService(
@@ -91,8 +91,8 @@ public class TaskServiceTests
 
         _userRepoMock.Setup(r => r.GetAllAsync())
             .ReturnsAsync(UsersWith(UserId));
-        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<List<Guid>>(), UserId))
-            .ReturnsAsync((List<Guid> ids, string uid) => ids.Select(id => CreateTag(id, uid)).ToList());
+        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<IEnumerable<Guid>>(), UserId))
+            .ReturnsAsync((IEnumerable<Guid> ids, string uid) => ids.Select(id => CreateTag(id, uid)).ToList());
         _taskRepoMock.Setup(r => r.AddAsync(It.IsAny<TaskItem>()))
             .ReturnsAsync(true);
 
@@ -135,7 +135,7 @@ public class TaskServiceTests
 
         _userRepoMock.Setup(r => r.GetAllAsync())
             .ReturnsAsync(UsersWith(UserId));
-        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<List<Guid>>(), UserId))
+        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<IEnumerable<Guid>>(), UserId))
             .ReturnsAsync(Enumerable.Empty<Tag>());
 
         var result = await _sut.CreateTaskAsync(UserId, request);
@@ -251,7 +251,7 @@ public class TaskServiceTests
 
         _taskRepoMock.Setup(r => r.GetByIdWithTagsAsync(taskId, UserId))
             .ReturnsAsync(task);
-        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<List<Guid>>(), UserId))
+        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<IEnumerable<Guid>>(), UserId))
             .ReturnsAsync(Enumerable.Empty<Tag>());
 
         var result = await _sut.UpdateTaskAsync(taskId, UserId, request);
@@ -462,7 +462,7 @@ public class TaskServiceTests
         var result = await _sut.UpdateTaskAsync(taskId, UserId, request);
 
         Assert.True(result);
-        _tagRepoMock.Verify(r => r.GetTagsByIdsAsync(It.IsAny<List<Guid>>(), It.IsAny<string>()), Times.Never);
+        _tagRepoMock.Verify(r => r.GetTagsByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
@@ -474,7 +474,7 @@ public class TaskServiceTests
 
         _userRepoMock.Setup(r => r.GetAllAsync())
             .ReturnsAsync(UsersWith(UserId));
-        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<List<Guid>>(), UserId))
+        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<IEnumerable<Guid>>(), UserId))
             .ReturnsAsync([CreateTag(tagId, UserId)]);
         _taskRepoMock.Setup(r => r.AddAsync(It.IsAny<TaskItem>()))
             .ReturnsAsync(true);
@@ -518,7 +518,7 @@ public class TaskServiceTests
 
         _userRepoMock.Setup(r => r.GetAllAsync())
             .ReturnsAsync(UsersWith(UserId));
-        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<List<Guid>>(), UserId))
+        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<IEnumerable<Guid>>(), UserId))
             .ReturnsAsync([CreateTag(validTagId, UserId)]);
 
         var result = await _sut.CreateTaskAsync(UserId, request);
@@ -568,7 +568,7 @@ public class TaskServiceTests
 
         _taskRepoMock.Setup(r => r.GetByIdWithTagsAsync(taskId, UserId))
             .ReturnsAsync(task);
-        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<List<Guid>>(), UserId))
+        _tagRepoMock.Setup(r => r.GetTagsByIdsAsync(It.IsAny<IEnumerable<Guid>>(), UserId))
             .ReturnsAsync([existingTag]);
         _taskRepoMock.Setup(r => r.UpdateAsync(It.IsAny<TaskItem>()))
             .ReturnsAsync(true);

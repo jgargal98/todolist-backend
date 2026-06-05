@@ -29,7 +29,7 @@ public interface ITagRepository
     /// <param name="tagIds">The collection of unique tag identifiers to query.</param>
     /// <param name="userId">The owner identifier verifying data security boundaries.</param>
     /// <returns>A collection of matching <see cref="Tag"/> entities belonging to the user context.</returns>
-    Task<IEnumerable<Tag>> GetTagsByIdsAsync(List<Guid> tagIds, string userId);
+    Task<IEnumerable<Tag>> GetTagsByIdsAsync(IEnumerable<Guid> tagIds, string userId);
 
     /// <summary>
     /// Appends a pristine tag entity instance to the tracking state for future persistence.
