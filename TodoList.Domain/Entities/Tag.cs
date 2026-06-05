@@ -1,39 +1,32 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace TodoList.Domain.Entities;
 
 /// <summary>
-/// Represents a tag that can be associated with multiple tasks.
+/// Represents a pure domain tag abstraction that can be associated with multiple tasks.
 /// </summary>
 public class Tag
 {
     /// <summary>
-    /// Unique identifier for the tag.
+    /// Unique identifier for the tag entity.
     /// </summary>
-    [Key]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     /// <summary>
-    /// Name of the tag.
+    /// The descriptive name of the tag.
     /// </summary>
-    [Required]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Foreign key referencing the owner of the tag.
+    /// Foreign key structural reference to the user identity owning this tag.
     /// </summary>
-    [Required]
     public string UserId { get; set; } = string.Empty;
 
     /// <summary>
-    /// Navigation property for the user who owns this tag.
+    /// Domain navigation reference to the user profile who owns this tag.
     /// </summary>
-    [ForeignKey("IdUser")]
     public virtual User User { get; set; } = null!;
 
     /// <summary>
-    /// Navigation property for the many-to-many relationship with TaskItems.
+    /// Domain navigation collection managing the structural many-to-many relationship with TaskItems.
     /// </summary>
     public virtual ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
 }

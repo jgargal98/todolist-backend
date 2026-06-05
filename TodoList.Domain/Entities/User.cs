@@ -7,7 +7,8 @@ namespace TodoList.Domain.Entities;
 /// </summary>
 public class User : IdentityUser
 {
-    // Custom properties can be added here in the future
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiryTime { get; set; }
 
     /// <summary>
     /// Navigation property for the tasks owned by this user.

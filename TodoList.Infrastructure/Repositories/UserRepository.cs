@@ -1,23 +1,58 @@
-namespace TodoList.Infrastructure.Repositories;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TodoList.Domain.Entities;
-using TodoList.Domain.Interfaces;
+using TodoList.Application.Interfaces;
+
+namespace TodoList.Infrastructure.Repositories;
 
 /// <summary>
-/// Implementation of user-related data operations using ASP.NET Identity.
+/// Infrastructure-specific implementation of <see cref="IUserRepository"/> 
+/// utilizing ASP.NET Core Identity for persistence and security operations.
 /// </summary>
+/// <remarks>
+/// This implementation uses C# 12 primary constructors to inject dependencies.
+/// It acts as a wrapper around <see cref="UserManager{TUser}"/>.
+/// </remarks>
 public class UserRepository(UserManager<User> userManager) : IUserRepository
 {
-    /// <summary>
-    /// Retrieves all registered users using LINQ Method Syntax.
-    /// </summary>
+    /// <inheritdoc />
     public async Task<IEnumerable<User>> GetAllAsync()
     {
-        // REQUIREMENT: Method syntax queries
         return await userManager.Users
             .OrderBy(u => u.UserName)
             .ToListAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task<User?> ValidateCredentialsAsync(string email, string password)
+    {
+        var user = await userManager.FindByEmailAsync(email);
+
+        if (user is null || !await userManager.CheckPasswordAsync(user, password))
+        {
+            return null;
+        }
+
+        return user;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> CreateAsync(User user, string password)
+    {
+        var result = await userManager.CreateAsync(user, password);
+        return result.Succeeded;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> UpdateAsync(User user)
+    {
+        var result = await userManager.UpdateAsync(user);
+        return result.Succeeded;
+    }
+
+    /// <inheritdoc />
+    public async Task<User?> GetByEmailAsync(string email)
+    {
+        return await userManager.FindByEmailAsync(email);
     }
 }

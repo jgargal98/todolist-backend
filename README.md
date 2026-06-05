@@ -1,78 +1,277 @@
-# Project Status: Notes Application (Full Stack)
+# TodoList API
 
-Technical summary of the current infrastructure, system configuration, and development progress for the Notes application.
+A **Clean Architecture** backend for a personal task management application built with **.NET 10**, **Entity Framework Core**, **ASP.NET Core Identity**, and **JWT authentication**. The API supports full CRUD for tasks, categories, tags, and user management with role-based access.
 
-## System Architecture
+## Project Status
 
-The system utilizes a decoupled cloud-based architecture:
+The project is fully functional with the following capabilities:
 
-- Framework: .NET 10 Web API (LTS).
-- Architecture: Clean Architecture (Domain, Application, Infrastructure, API).
-- Database: Azure SQL Database (Relational).
-- Hosting: Azure App Service (F1 - Free Plan).
-- Frontend: Azure Static Web App.
-- Deployment: Integrated CI/CD via GitHub Actions.
+- [x] User registration and login with JWT (access + refresh tokens)
+- [x] Task CRUD with subtasks, status, due dates, categories, and tags
+- [x] Category CRUD (per-user scoped)
+- [x] Tag CRUD (many-to-many relationship with tasks)
+- [x] User listing
+- [x] Input validation via FluentValidation
+- [x] Global exception handling middleware
+- [x] Swagger/OpenAPI documentation with JWT bearer auth
+- [x] AutoMapper for entity-to-DTO mapping
+- [x] EF Core auto-migrations at startup via `InitializeDatabaseAsync`
+- [x] CORS policy configured for Angular frontend
+- [x] Asymmetric RSA key pair (RS256) for JWT signing
+- [x] Unit tests (xUnit + Moq + FluentValidation)
+- [x] Integration tests (xUnit + WebApplicationFactory + InMemory DB)
 
-## Implemented Configurations
+## Tech Stack
 
-### 1. Data Layer (Azure SQL)
+| Technology            | Version |
+| --------------------- | ------- |
+| .NET                  | 10.0    |
+| Entity Framework Core | 10.0.7  |
+| ASP.NET Core Identity | 10.0.7  |
+| JWT Bearer Auth       | 10.0.7  |
+| AutoMapper            | 16.1.1  |
+| FluentValidation      | 12.1.1  |
+| Swashbuckle (Swagger) | 10.1.7  |
+| SQL Server (LocalDB)  | LocalDB |
+| xUnit                 | 2.9.3   |
+| Moq                   | 4.20.72 |
+| FluentAssertions      | 7.2.0   |
 
-- Instance: Logical SQL Server provisioned in a region with available quota.
-- Network Security:
-    - Firewall enabled for internal Azure service communication.
-    - Local IP whitelisting configured for development environment access.
-- Access: Configured via SQL Server Authentication.
+## Architecture
 
-### 2. Application Layer (App Service)
+The solution follows **Clean Architecture** principles with four projects:
 
-- Platform: App Service running on a .NET-optimized environment.
-- Secret Management: Connection string injection implemented via Azure Environment Variables (ConnectionStrings\_\_DefaultConnection).
-- Code Security: The appsettings.json file in the repository contains no sensitive credentials, delegating real authentication to the Azure Portal configuration.
+```
+TodoList.Domain         → Entities (no dependencies)
+TodoList.Application    → DTOs, services, mappings, interfaces
+TodoList.Infrastructure → EF Core, repositories, JWT provider, DB seeding
+TodoList.API            → Controllers, middleware, validation, startup
+```
 
-### 3. Deployment Workflow (CI/CD)
+Dependency flow: `API → Application → Domain` and `API → Infrastructure → Application + Domain`.
 
-- Repository: GitHub ([jgargal/TodoList](https://github.com/jgargal98/todolist)).
-- Automation: A production-ready workflow is established where every push to the main branch triggers a GitHub Action to build, test, and deploy the code directly to the Azure production environment.
+### File Structure
 
-## System Design and Visualization
-
-To ensure scalability and maintainability, the project follows strict architectural and data modeling standards.
-
-### File Structure and Clean Architecture
-
-The following structure demonstrates the separation of concerns. The Domain layer remains independent, while Infrastructure handles data persistence and Application manages business logic and DTO mapping.
-
-```text
+```
 todolist/
-├── .github/workflows/          # CI/CD Pipelines (Backend & Frontend)
 ├── backend/
-│   ├── TodoList.API/           # Entry point, Controllers, and Program.cs
-│   ├── TodoList.Application/   # DTOs, Interfaces, Mappings, and Services
-│   ├── TodoList.Domain/        # Entities and Repository Interfaces
-│   └── TodoList.Infrastructure/# Data Context, Repositories, and Migrations
+│   ├── TodoList.API/               # Entry point, Controllers, Program.cs
+│   │   ├── Controllers/            # Auth, Tasks, Categories, Tags, Users
+│   │   ├── Middlewares/            # GlobalExceptionMiddleware
+│   │   └── Validation/            # FluentValidation validators
+│   ├── TodoList.Application/       # DTOs, Interfaces, Services, Mappings
+│   ├── TodoList.Domain/            # Entities (User, TaskItem, Category, Tag)
+│   ├── TodoList.Infrastructure/    # Data context, Repositories, JWT, seeding
+│   ├── TodoList.UnitTests/         # Unit tests (validators, services, mappings)
+│   ├── TodoList.IntegrationTests/  # Integration tests (full HTTP pipeline)
+│   └── TodoList.API.postman_collection.json  # Postman collection for demo
 │
-│
-└── frontend/                   # Angular front end
+└── frontend/                       # Angular front end
+```
+
+## Data Model
+
+### Entities
+
+| Entity       | Description                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------------- |
+| **User**     | Custom Identity user with `RefreshToken` and `RefreshTokenExpiryTime`                          |
+| **TaskItem** | Core task with title, description, due date, status (1-5), subtasks (JSON), category, and tags |
+| **SubTask**  | Owned value object stored as JSON array within TaskItem                                        |
+| **Category** | User-scoped task categories                                                                    |
+| **Tag**      | User-scoped labels with many-to-many relationship to tasks (join table `TaskTags`)             |
+
+### Entity Relationships
+
+```
+User (1) ──< TaskItem (N)
+User (1) ──< Category (N)
+User (1) ──< Tag (N)
+Category (1) ──< TaskItem (N)
+TaskItem (M) >──< Tag (N)  [via TaskTags]
 ```
 
 ### Data Model (Entity Relationship Diagram)
 
-The database schema is designed to handle user authentication and relational note management efficiently. This diagram illustrates the core entities and their relationships within the Azure SQL instance.
-
 ![Entity Relationship Diagram](ToDo-Schema.png)
 
-## Recent Development Progress
+## Getting Started
 
-The following critical backend milestones have been achieved:
+### Prerequisites
 
-- Clean Architecture Implementation: Structured the solution into Domain, Application, Infrastructure, and API projects.
-- DTO Mapping: Integrated AutoMapper to decouple domain entities from API responses, ensuring secure data transfer and abstraction.
-- Repository Pattern: Established the foundation for data access through interfaces in the Domain layer and implementations in the Infrastructure layer.
+- .NET 10 SDK
+- SQL Server LocalDB (comes with Visual Studio) or full SQL Server
 
-## Current Status
+### Setup
 
-- Backend (API): Fully operational. Deployed on Azure App Service using .NET 10 LTS. The API handles database migrations automatically via the DbInitializer on startup.
-- Frontend: Fully deployed. Hosted as an Azure Static Web App, communicating with the production API endpoint.
-- Connectivity: Link between App Service and SQL Database verified through environment variables.
-- Codebase: Repository synchronized and hardened against credential leaks.
-- Database: Schema is up to date and provisioned on Azure SQL.
+1. **Clone the repository** and navigate to `backend/`
+2. **Run the API**:
+
+    ```bash
+    dotnet run --project TodoList.API
+    ```
+
+    The API starts at `http://localhost:5124`. Swagger UI is available at `http://localhost:5124/swagger`.
+
+### Default Admin Account
+
+On first run, the application seeds an admin user:
+
+| Field    | Value                |
+| -------- | -------------------- |
+| Email    | `admin@todolist.com` |
+| Username | `admin`              |
+| Password | `Admin123!`          |
+
+## API Endpoints
+
+### Authentication (`api/Auth`)
+
+| Method | Path                 | Description                        |
+| ------ | -------------------- | ---------------------------------- |
+| POST   | `/api/Auth/register` | Register a new user                |
+| POST   | `/api/Auth/login`    | Login, returns JWT + refresh token |
+| POST   | `/api/Auth/refresh`  | Refresh expired access token       |
+
+### Tasks (`api/Tasks`)
+
+All task endpoints require a valid JWT (`Authorization: Bearer <token>`).
+
+| Method | Path                   | Description                               |
+| ------ | ---------------------- | ----------------------------------------- |
+| GET    | `/api/Tasks`           | List all tasks for the authenticated user |
+| POST   | `/api/Tasks`           | Create a new task                         |
+| PUT    | `/api/Tasks/{id}`      | Update a task                             |
+| DELETE | `/api/Tasks/{id:guid}` | Delete a task                             |
+
+### Categories (`api/Categories`)
+
+| Method | Path                        | Description          |
+| ------ | --------------------------- | -------------------- |
+| GET    | `/api/Categories`           | List user categories |
+| POST   | `/api/Categories`           | Create a category    |
+| PUT    | `/api/Categories/{id:guid}` | Update a category    |
+| DELETE | `/api/Categories/{id:guid}` | Delete a category    |
+
+### Tags (`api/Tags`)
+
+| Method | Path                  | Description    |
+| ------ | --------------------- | -------------- |
+| GET    | `/api/Tags`           | List user tags |
+| POST   | `/api/Tags`           | Create a tag   |
+| DELETE | `/api/Tags/{id:guid}` | Delete a tag   |
+
+### Users (`api/Users`)
+
+| Method | Path         | Description               |
+| ------ | ------------ | ------------------------- |
+| GET    | `/api/Users` | List all registered users |
+
+### Health Check
+
+| Method | Path              | Description                    |
+| ------ | ----------------- | ------------------------------ |
+| GET    | `/api/HelloWorld` | Returns `"hello from the api"` |
+
+### Task Status Values
+
+| Value | Name        |
+| ----- | ----------- |
+| 1     | Pending     |
+| 2     | In Progress |
+| 3     | On Hold     |
+| 4     | Completed   |
+| 5     | Canceled    |
+
+## Testing
+
+The solution contains two test projects: **Unit Tests** and **Integration Tests**.
+
+### Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run only unit tests
+dotnet test TodoList.UnitTests
+
+# Run only integration tests
+dotnet test TodoList.IntegrationTests
+```
+
+### Unit Tests (`TodoList.UnitTests`)
+
+Uses **xUnit** + **Moq** + **FluentValidation TestHelper**. Located at `TodoList.UnitTests/`.
+
+| Category       | File                                                          | What it tests                                   |
+| -------------- | ------------------------------------------------------------- | ----------------------------------------------- |
+| Validators     | `Validators/Auth/LoginRequestValidatorTests.cs`               | Login email/password validation rules           |
+| Validators     | `Validators/Auth/RegisterRequestValidatorTests.cs`            | Register email, password, confirm rules         |
+| Validators     | `Validators/Auth/RefreshRequestValidatorTests.cs`             | Refresh token presence validation               |
+| Validators     | `Validators/Category/CreateCategoryRequestValidatorTests.cs`  | Category name max length and required rules     |
+| Validators     | `Validators/Category/UpdateCategoryRequestValidatorTests.cs`  | Category name max length and required rules     |
+| Validators     | `Validators/Tag/CreateTagRequestValidatorTests.cs`            | Tag name max length and required rules          |
+| Validators     | `Validators/Task/CreateTaskRequestValidatorTests.cs`          | Task title, description, status, due date, subs |
+| Validators     | `Validators/Task/UpdateTaskRequestValidatorTests.cs`          | Task title, description, status, due date, subs |
+| Services       | `Services/AuthServiceTests.cs`                                | Login, register, refresh token logic            |
+| Services       | `Services/CategoryServiceTests.cs`                            | Category CRUD with user-scoping                 |
+| Services       | `Services/TagServiceTests.cs`                                 | Tag CRUD with user-scoping                      |
+| Services       | `Services/TaskServiceTests.cs`                                | Task CRUD with subtasks, tags, ownership        |
+| Services       | `Services/UserServiceTests.cs`                                | User listing                                    |
+| Mappings       | `Mappings/MappingProfileTests.cs`                             | AutoMapper configuration validity and mapping   |
+
+### Integration Tests (`TodoList.IntegrationTests`)
+
+Uses **xUnit** + **WebApplicationFactory** + **InMemory Database** + **TestAuthHandler**. Located at `TodoList.IntegrationTests/`.
+
+The `IntegrationTestWebApplicationFactory`:
+- Replaces SQL Server with an **EF Core InMemory** database
+- Replaces JWT Bearer auth with `TestAuthHandler` (auto-authenticated requests)
+- Generates ephemeral RSA keys for the real JwtProvider
+- Seeds a test user via `UserManager`
+
+| File                                | What it tests                                      |
+| ----------------------------------- | -------------------------------------------------- |
+| `AuthIntegrationTests.cs`           | Register, login, refresh, duplicate email, bad auth|
+| `TasksIntegrationTests.cs`          | Create, get all, update, delete tasks              |
+| `CategoriesIntegrationTests.cs`     | Create, get all, update, delete categories         |
+| `TagsIntegrationTests.cs`           | Create, get all, delete tags                       |
+| `UsersIntegrationTests.cs`          | List all users                                     |
+| `HelloWorldIntegrationTests.cs`     | Public health check endpoint                       |
+| `ExceptionIntegrationTests.cs`      | Global exception handling middleware               |
+
+### Postman Collection
+
+For manual API testing and demos, a **Postman collection** (v2.1.0) is available at:
+
+```
+TodoList.API.postman_collection.json
+```
+
+Import it into Postman (`File → Import`) and follow this flow:
+
+1. Open the **Auth > Login** request body and set valid credentials
+2. **Send Login** — the test script auto-saves the JWT to `{{jwt_token}}`
+3. All protected endpoints (Tasks, Categories, Tags, Users) inherit the token automatically via folder-level Bearer auth
+4. Use **Create Task / Category / Tag** to generate resources; their IDs are captured automatically for subsequent update/delete requests
+
+Collection variables:
+
+| Variable         | Default                  | Description                     |
+| ---------------- | ------------------------ | ------------------------------- |
+| `base_url`       | `http://localhost:5124`   | API base URL                    |
+| `jwt_token`      | *(empty)*                | Auto-populated after login      |
+| `refresh_token`  | *(empty)*                | Auto-populated after login      |
+| `task_id`        | *(empty)*                | Auto-populated after creation   |
+| `category_id`    | *(empty)*                | Auto-populated after creation   |
+| `tag_id`         | *(empty)*                | Auto-populated after creation   |
+
+## Configuration
+
+Key settings in `appsettings.json`:
+
+- **ConnectionStrings:DefaultConnection** — SQL Server connection string (LocalDB by default)
+- **Jwt** — RSA private/public keys (PEM), issuer, and audience
+- **IdentityOptions** — Password policy and user settings
+- **CORS** — Frontend URL allowed (default `http://localhost:3000`, overridable via `FrontendUrl` env var)
